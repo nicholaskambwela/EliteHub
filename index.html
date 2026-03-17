@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nicholas' Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #090d13;
+    --bg2: #0d1520;
+    --bg3: #111d2e;
+    --panel: #0f1a27;
+    --border: #1a3a5c;
+    --border-glow: #0ea5e9;
+    --accent: #00d4ff;
+    --accent2: #00ff9d;
+    --accent3: #ff6b35;
+    --warn: #ffb347;
+    --text: #c8dff0;
+    --text-dim: #4a7fa0;
+    --text-bright: #e8f4ff;
+    --red: #ff4444;
+    --grid-line: rgba(0,212,255,0.05);
+    --glow: 0 0 20px rgba(0,212,255,0.3);
+    --glow2: 0 0 20px rgba(0,255,157,0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 40px 40px;
+    overflow-x: hidden;
+  }
+
+  /* SCANLINE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* NAV */
+  nav {
+    display: flex;
+    align-items: center;
+    padding: 0 2rem;
+    height: 60px;
+    background: rgba(9,13,19,0.95);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 30px rgba(0,212,255,0.1);
+  }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--accent);
+    text-shadow: var(--glow);
+    letter-spacing: 2px;
+    margin-right: 3rem;
+    white-space: nowrap;
+  }
+  .logo span { color: var(--text-dim); font-weight: 400; }
+
+  .nav-links {
+    display: flex;
+    gap: 0.2rem;
+    flex: 1;
+    list-style: none;
+  }
+  .nav-links li a {
+    display: block;
+    padding: 0.4rem 1rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .nav-links li a:hover,
+  .nav-links li a.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    text-shadow: var(--glow);
+  }
+
+  .nav-search {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.3rem 0.7rem;
+  }
+  .nav-search input {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    width: 180px;
+  }
+  .nav-search input::placeholder { color: var(--text-dim); }
+  .nav-search button {
+    background: none;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  /* LAYOUT */
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 0;
+    min-height: calc(100vh - 60px);
+  }
+
+  /* SIDEBAR */
+  aside {
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .sidebar-section h3 {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-dim);
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    margin-bottom: 0.2rem;
+  }
+  .sidebar-item:hover {
+    background: var(--bg3);
+    border-color: var(--border);
+    color: var(--text-bright);
+  }
+  .sidebar-item.active {
+    background: rgba(0,212,255,0.07);
+    border-color: var(--border-glow);
+    color: var(--accent);
+  }
+  .sidebar-item .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: var(--glow);
+    flex-shrink: 0;
+  }
+  .sidebar-item .dot.green { background: var(--accent2); box-shadow: var(--glow2); }
+  .sidebar-item .dot.orange { background: var(--accent3); }
+
+  .sidebar-deadline {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 0.6rem;
+    border-radius: 4px;
+    border-left: 2px solid var(--warn);
+    background: rgba(255,179,71,0.05);
+    margin-bottom: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+  .sidebar-deadline .dl-date {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--warn);
+    margin-top: 0.15rem;
+  }
+
+  .quick-link {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.88rem;
+    transition: all 0.2s;
+    cursor: pointer;
+    margin-bottom: 0.2rem;
+  }
+  .quick-link:hover {
+    color: var(--accent2);
+    background: rgba(0,255,157,0.05);
+  }
+  .quick-link .ql-icon {
+    width: 24px; height: 24px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem;
+    background: var(--bg3);
+  }
+
+  /* MAIN */
+  main {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  /* PAGE SECTIONS (tabs) */
+  .page { display: none; flex-direction: column; gap: 1.2rem; }
+  .page.active { display: flex; }
+
+  /* PANELS */
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.2rem 1.4rem;
+    position: relative;
+    transition: border-color 0.3s;
+  }
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.4;
+    border-radius: 6px 6px 0 0;
+  }
+  .panel:hover { border-color: var(--border-glow); }
+
+  .panel-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .panel-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* DASHBOARD GRID */
+  .dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+  }
+  .dash-grid .full { grid-column: 1 / -1; }
+
+  /* TASKS */
+  .task-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(26,58,92,0.4);
+    font-size: 0.95rem;
+  }
+  .task-item:last-child { border-bottom: none; }
+  .task-item label { cursor: pointer; flex: 1; transition: color 0.2s; }
+  .task-item input[type=checkbox] {
+    appearance: none;
+    width: 16px; height: 16px;
+    border: 1px solid var(--border-glow);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .task-item input[type=checkbox]:checked {
+    background: var(--accent2);
+    border-color: var(--accent2);
+    box-shadow: var(--glow2);
+  }
+  .task-item input[type=checkbox]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: -1px; left: 2px;
+    font-size: 11px;
+    color: #000;
+    font-weight: bold;
+  }
+  .task-item input[type=checkbox]:checked + label {
+    text-decoration: line-through;
+    color: var(--text-dim);
+  }
+
+  .add-task-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+  }
+  .add-task-row input {
+    flex: 1;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.4rem 0.7rem;
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .add-task-row input:focus { border-color: var(--accent); }
+  .add-task-row input::placeholder { color: var(--text-dim); }
+  .btn {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 0.4rem 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+  .btn:hover {
+    background: rgba(0,212,255,0.1);
+    box-shadow: var(--glow);
+  }
+  .btn.green { border-color: var(--accent2); color: var(--accent2); }
+  .btn.green:hover { background: rgba(0,255,157,0.1); box-shadow: var(--glow2); }
+  .btn.red { border-color: var(--red); color: var(--red); }
+  .btn.red:hover { background: rgba(255,68,68,0.1); }
+  .btn.sm { padding: 0.25rem 0.6rem; font-size: 0.7rem; }
+
+  /* EXAMS */
+  .exam-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0.8rem;
+    border-radius: 4px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
+  }
+  .exam-item:hover { border-color: var(--border-glow); }
+  .exam-date {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--warn);
+  }
+  .exam-countdown {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    border: 1px solid var(--warn);
+    color: var(--warn);
+  }
+  .exam-countdown.soon { border-color: var(--red); color: var(--red); }
+
+  /* NOTES */
+  .notes-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    min-height: 60px;
+  }
+  .sticky-note {
+    width: 140px;
+    min-height: 100px;
+    background: #1a2a1a;
+    border: 1px solid #2a5a2a;
+    border-radius: 4px;
+    padding: 0.7rem;
+    font-size: 0.82rem;
+    color: var(--accent2);
+    font-family: 'Share Tech Mono', monospace;
+    position: relative;
+    word-break: break-word;
+    box-shadow: 0 0 15px rgba(0,255,157,0.1);
+    animation: noteIn 0.3s ease;
+  }
+  .sticky-note.type2 {
+    background: #1a1a2a;
+    border-color: #2a2a5a;
+    color: var(--accent);
+    box-shadow: 0 0 15px rgba(0,212,255,0.1);
+  }
+  .sticky-note .del-note {
+    position: absolute;
+    top: 4px; right: 6px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 0.8rem;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+  .sticky-note .del-note:hover { color: var(--red); }
+  @keyframes noteIn {
+    from { opacity: 0; transform: scale(0.8) rotate(-3deg); }
+    to { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+
+  .add-note-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .add-note-row input {
+    flex: 1;
+    min-width: 200px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.4rem 0.7rem;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .add-note-row input:focus { border-color: var(--accent2); }
+  .add-note-row input::placeholder { color: var(--text-dim); }
+
+  /* PROGRESS */
+  .progress-stat {
+    margin-bottom: 0.8rem;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 0.4rem;
+  }
+  .progress-label span:last-child {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+  }
+  .progress-bar {
+    height: 8px;
+    background: var(--bg3);
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    box-shadow: 0 0 10px rgba(0,212,255,0.5);
+    transition: width 0.6s ease;
+  }
+  .streak-box {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.6rem 0.8rem;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-bottom: 0.8rem;
+    font-size: 0.9rem;
+  }
+  .streak-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-shadow: var(--glow);
+    line-height: 1;
+  }
+  .streak-label { color: var(--text-dim); font-size: 0.8rem; }
+
+  .study-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .study-controls input[type=number] {
+    width: 70px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.3rem 0.5rem;
+    color: var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    outline: none;
+    text-align: center;
+  }
+  .study-controls label { font-size: 0.8rem; color: var(--text-dim); }
+
+  /* CALENDAR */
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+  .cal-header {
+    text-align: center;
+    padding: 0.4rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .cal-day {
+    min-height: 70px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.3rem;
+    font-size: 0.75rem;
+    transition: border-color 0.2s;
+    cursor: pointer;
+  }
+  .cal-day:hover { border-color: var(--border-glow); }
+  .cal-day.today {
+    border-color: var(--accent);
+    box-shadow: inset 0 0 15px rgba(0,212,255,0.05);
+  }
+  .cal-day.empty { background: transparent; border-color: transparent; cursor: default; }
+  .cal-day-num {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--text-dim);
+    font-size: 0.7rem;
+  }
+  .cal-day.today .cal-day-num { color: var(--accent); }
+  .cal-event {
+    margin-top: 2px;
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-size: 0.65rem;
+    background: rgba(0,212,255,0.15);
+    border-left: 2px solid var(--accent);
+    color: var(--accent);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cal-event.warn {
+    background: rgba(255,179,71,0.12);
+    border-color: var(--warn);
+    color: var(--warn);
+  }
+
+  /* COURSES PAGE */
+  .courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+  .course-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.2rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.2s;
+    cursor: pointer;
+  }
+  .course-card:hover {
+    border-color: var(--border-glow);
+    transform: translateY(-2px);
+  }
+  .course-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .course-card.c1::before { background: var(--accent); }
+  .course-card.c2::before { background: var(--accent2); }
+  .course-card.c3::before { background: var(--accent3); }
+  .course-card.c4::before { background: var(--warn); }
+  .course-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+    color: var(--text-bright);
+    margin-bottom: 0.3rem;
+  }
+  .course-code {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-bottom: 0.8rem;
+  }
+  .course-prog-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    margin-bottom: 0.3rem;
+  }
+
+  /* NOTES PAGE */
+  .notes-page-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+  .note-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 120px;
+    position: relative;
+  }
+  .note-card:hover { border-color: var(--border-glow); }
+  .note-card-title {
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+  }
+  .note-card-body {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .note-card-date {
+    position: absolute;
+    bottom: 0.6rem; right: 0.8rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--text-dim);
+  }
+  .note-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .note-editor input, .note-editor textarea {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.5rem 0.8rem;
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: none;
+  }
+  .note-editor input:focus, .note-editor textarea:focus { border-color: var(--accent); }
+  .note-editor input::placeholder, .note-editor textarea::placeholder { color: var(--text-dim); }
+  .note-editor textarea { min-height: 100px; }
+
+  /* PROFILE */
+  .profile-section {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  .avatar {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: var(--bg3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', monospace;
+    font-size: 1.8rem;
+    color: var(--accent);
+    text-shadow: var(--glow);
+    box-shadow: var(--glow);
+  }
+  .profile-info h2 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.1rem;
+    color: var(--text-bright);
+    margin-bottom: 0.3rem;
+  }
+  .profile-info p {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 0.2rem;
+  }
+  .profile-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin-top: 1rem;
+  }
+  .profile-field label {
+    display: block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+  .profile-field input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.4rem 0.7rem;
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .profile-field input:focus { border-color: var(--accent); }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 1rem;
+    border-top: 1px solid var(--border);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    background: var(--bg2);
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-shadow: var(--glow); }
+
+  /* STATUS BAR */
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.3rem 2rem;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+  }
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent2);
+    box-shadow: var(--glow2);
+    display: inline-block;
+    margin-right: 0.3rem;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    padding: 1.5rem;
+    width: 400px;
+    max-width: 90vw;
+    box-shadow: 0 0 40px rgba(0,212,255,0.2);
+    animation: modalIn 0.2s ease;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal h3 {
+    font-family: 'Orbitron', monospace;
+    color: var(--accent);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+  .modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem; }
+
+  /* RESOURCES */
+  .resources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.8rem;
+  }
+  .resource-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: block;
+  }
+  .resource-card:hover {
+    border-color: var(--border-glow);
+    transform: translateY(-2px);
+    box-shadow: var(--glow);
+  }
+  .resource-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .resource-name {
+    font-weight: 700;
+    color: var(--text-bright);
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+  }
+  .resource-desc { font-size: 0.78rem; color: var(--text-dim); }
+
+  .toast {
+    position: fixed;
+    bottom: 1.5rem; right: 1.5rem;
+    background: var(--bg2);
+    border: 1px solid var(--accent2);
+    border-radius: 6px;
+    padding: 0.7rem 1.2rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent2);
+    box-shadow: var(--glow2);
+    z-index: 9000;
+    animation: toastIn 0.3s ease;
+    pointer-events: none;
+  }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <span><span class="status-dot"></span>SYSTEM ONLINE</span>
+  <span id="sb-time"></span>
+  <span id="sb-date"></span>
+  <span style="margin-left:auto;">NICHOLAS' HUB v1.0</span>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">N<span>'s</span> HUB</div>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="#" class="active" data-page="dashboard">Dashboard</a></li>
+    <li><a href="#" data-page="courses">Courses</a></li>
+    <li><a href="#" data-page="notes">Notes</a></li>
+    <li><a href="#" data-page="calendar">Calendar</a></li>
+    <li><a href="#" data-page="resources">Resources</a></li>
+    <li><a href="#" data-page="profile">Profile</a></li>
+  </ul>
+  <div class="nav-search">
+    <input type="text" placeholder="search..." id="global-search"/>
+    <button>⌕</button>
+  </div>
+</nav>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside>
+    <div class="sidebar-section">
+      <h3>Courses</h3>
+      <div id="sidebar-courses"></div>
+    </div>
+    <div class="sidebar-section">
+      <h3>Deadlines</h3>
+      <div id="sidebar-deadlines"></div>
+    </div>
+    <div class="sidebar-section">
+      <h3>Quick Links</h3>
+      <a class="quick-link" href="https://github.com" target="_blank">
+        <div class="ql-icon">⌥</div> GitHub
+      </a>
+      <a class="quick-link" href="#" onclick="navigate('resources')">
+        <div class="ql-icon">📚</div> Library
+      </a>
+      <a class="quick-link" href="#" onclick="openCalc()">
+        <div class="ql-icon">∑</div> Calculator
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="dash-grid">
+
+        <!-- TASKS -->
+        <div class="panel">
+          <div class="panel-title">Today's Tasks</div>
+          <div id="task-list"></div>
+          <div class="add-task-row">
+            <input type="text" id="task-input" placeholder="add task..." />
+            <button class="btn green" onclick="addTask()">+ ADD</button>
+          </div>
+        </div>
+
+        <!-- EXAMS -->
+        <div class="panel">
+          <div class="panel-title">Upcoming Exams</div>
+          <div id="exam-list"></div>
+          <div class="add-task-row" style="margin-top:0.8rem;">
+            <input type="text" id="exam-name-input" placeholder="exam name..." style="flex:2"/>
+            <input type="date" id="exam-date-input" style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.4rem 0.5rem;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.75rem;outline:none;"/>
+            <button class="btn" onclick="addExam()">+ ADD</button>
+          </div>
+        </div>
+
+        <!-- NOTES -->
+        <div class="panel">
+          <div class="panel-title">Quick Notes</div>
+          <div class="notes-grid" id="quick-notes-grid"></div>
+          <div class="add-note-row">
+            <input type="text" id="quick-note-input" placeholder="jot something down..." />
+            <button class="btn green" onclick="addQuickNote(0)">GREEN</button>
+            <button class="btn" onclick="addQuickNote(1)">BLUE</button>
+          </div>
+        </div>
+
+        <!-- PROGRESS -->
+        <div class="panel">
+          <div class="panel-title">Study Progress</div>
+          <div class="streak-box">
+            <div>
+              <div class="streak-num" id="streak-num">0</div>
+              <div class="streak-label">day streak</div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:0.3rem;">Keep it up. Don't break the chain.</div>
+              <button class="btn green sm" onclick="logStudy()">✓ LOG TODAY</button>
+            </div>
+          </div>
+          <div id="course-progress-bars"></div>
+          <div class="study-controls">
+            <label>Daily goal:</label>
+            <input type="number" id="study-goal" value="5" min="1" max="24" onchange="saveGoal()"/>
+            <label>hrs &nbsp; Today:</label>
+            <input type="number" id="study-today" value="0" min="0" max="24" step="0.5" onchange="saveToday()"/>
+            <label>hrs</label>
+          </div>
+          <div id="daily-progress" style="margin-top:0.8rem;"></div>
+        </div>
+
+        <!-- MINI CALENDAR -->
+        <div class="panel full">
+          <div class="panel-title">This Week</div>
+          <div id="mini-calendar"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- COURSES -->
+    <div class="page" id="page-courses">
+      <div class="panel">
+        <div class="panel-title">My Courses</div>
+        <div class="add-task-row">
+          <input type="text" id="course-name-input" placeholder="course name..." />
+          <input type="text" id="course-code-input" placeholder="code..." style="width:90px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.4rem 0.7rem;color:var(--text);font-family:'Rajdhani',sans-serif;outline:none;"/>
+          <button class="btn green" onclick="addCourse()">+ ADD COURSE</button>
+        </div>
+      </div>
+      <div class="courses-grid" id="courses-grid"></div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="page" id="page-notes">
+      <div class="panel">
+        <div class="panel-title">New Note</div>
+        <div class="note-editor">
+          <input type="text" id="note-title-input" placeholder="Note title..." />
+          <textarea id="note-body-input" placeholder="Write your note here..."></textarea>
+          <div style="display:flex;gap:0.5rem;">
+            <button class="btn green" onclick="saveNote()">SAVE NOTE</button>
+          </div>
+        </div>
+      </div>
+      <div class="notes-page-grid" id="notes-page-grid"></div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="page" id="page-calendar">
+      <div class="panel">
+        <div class="panel-title" id="cal-title">Calendar</div>
+        <div style="display:flex;gap:0.5rem;margin-bottom:1rem;align-items:center;">
+          <button class="btn sm" onclick="prevMonth()">◀ PREV</button>
+          <button class="btn sm" onclick="nextMonth()">NEXT ▶</button>
+          <div style="flex:1"></div>
+          <input type="text" id="cal-event-input" placeholder="event name..." style="width:180px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.3rem 0.7rem;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:0.85rem;outline:none;"/>
+          <input type="date" id="cal-event-date" style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.3rem 0.5rem;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.75rem;outline:none;"/>
+          <button class="btn" onclick="addCalEvent()">+ EVENT</button>
+        </div>
+        <div id="full-calendar"></div>
+      </div>
+    </div>
+
+    <!-- RESOURCES -->
+    <div class="page" id="page-resources">
+      <div class="panel">
+        <div class="panel-title">Resource Library</div>
+        <div class="resources-grid" id="resources-grid"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Add Resource</div>
+        <div class="add-task-row" style="flex-wrap:wrap;">
+          <input type="text" id="res-name" placeholder="name..." style="flex:1;min-width:120px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.4rem 0.7rem;color:var(--text);font-family:'Rajdhani',sans-serif;outline:none;"/>
+          <input type="text" id="res-url" placeholder="URL..." style="flex:2;min-width:200px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.4rem 0.7rem;color:var(--text);font-family:'Rajdhani',sans-serif;outline:none;"/>
+          <input type="text" id="res-icon" placeholder="emoji..." style="width:60px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.4rem 0.5rem;color:var(--text);font-family:'Rajdhani',sans-serif;outline:none;text-align:center;"/>
+          <button class="btn green" onclick="addResource()">+ ADD</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="page" id="page-profile">
+      <div class="panel">
+        <div class="panel-title">Profile</div>
+        <div class="profile-section">
+          <div class="avatar" id="avatar-display">N</div>
+          <div class="profile-info">
+            <h2 id="profile-name-display">Nicholas</h2>
+            <p id="profile-uni-display">University of Zambia</p>
+            <p id="profile-email-display">nicholas@email.com</p>
+          </div>
+        </div>
+        <div class="profile-fields">
+          <div class="profile-field">
+            <label>Full Name</label>
+            <input type="text" id="p-name" value="Nicholas" oninput="updateProfile()"/>
+          </div>
+          <div class="profile-field">
+            <label>Email</label>
+            <input type="text" id="p-email" value="nicholas@email.com" oninput="updateProfile()"/>
+          </div>
+          <div class="profile-field">
+            <label>University</label>
+            <input type="text" id="p-uni" value="University of Zambia" oninput="updateProfile()"/>
+          </div>
+          <div class="profile-field">
+            <label>Year</label>
+            <input type="text" id="p-year" value="2nd Year" oninput="updateProfile()"/>
+          </div>
+          <div class="profile-field">
+            <label>GitHub</label>
+            <input type="text" id="p-github" value="github.com/nicholas" oninput="updateProfile()"/>
+          </div>
+          <div class="profile-field">
+            <label>Major</label>
+            <input type="text" id="p-major" value="Computer Science" oninput="updateProfile()"/>
+          </div>
+        </div>
+        <div style="margin-top:1rem;">
+          <button class="btn green" onclick="saveProfile()">SAVE PROFILE</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  © 2025 NICHOLAS' HUB &bull; <a href="https://github.com" target="_blank">GitHub</a> &bull; Built with ☕
+</footer>
+
+<!-- CALC MODAL -->
+<div class="modal-overlay" id="calc-modal">
+  <div class="modal" style="width:300px;">
+    <h3>// CALCULATOR</h3>
+    <input type="text" id="calc-display" readonly style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0.6rem 0.8rem;color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:1.2rem;text-align:right;outline:none;margin-bottom:0.8rem;"/>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.4rem;" id="calc-btns"></div>
+    <div class="modal-actions"><button class="btn red sm" onclick="document.getElementById('calc-modal').classList.remove('open')">CLOSE</button></div>
+  </div>
+</div>
+
+<script>
+// ====== STORAGE ======
+const S = {
+  get: (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
+};
+
+// ====== STATE ======
+let state = {
+  tasks: S.get('nh_tasks', []),
+  exams: S.get('nh_exams', [
+    { id: 1, name: 'Computer Systems', date: '2026-04-15' },
+    { id: 2, name: 'Computer Architecture', date: '2026-04-20' },
+    { id: 3, name: 'Discrete Math', date: '2026-04-25' },
+  ]),
+  quickNotes: S.get('nh_qnotes', [
+    { id: 1, text: 'Review logic laws', type: 0 },
+    { id: 2, text: 'IAS assembly practice', type: 1 },
+  ]),
+  courses: S.get('nh_courses', [
+    { id: 1, name: 'Computer Systems', code: 'CS301', progress: 65 },
+    { id: 2, name: 'Computer Architecture', code: 'CS302', progress: 50 },
+    { id: 3, name: 'Discrete Mathematics', code: 'CS201', progress: 70 },
+    { id: 4, name: 'Java Programming', code: 'CS210', progress: 80 },
+  ]),
+  notes: S.get('nh_notes', []),
+  calEvents: S.get('nh_calevents', []),
+  resources: S.get('nh_resources', [
+    { id: 1, name: 'GitHub', url: 'https://github.com', icon: '⌥', desc: 'Code hosting' },
+    { id: 2, name: 'W3Schools', url: 'https://w3schools.com', icon: '🌐', desc: 'Web tutorials' },
+    { id: 3, name: 'Stack Overflow', url: 'https://stackoverflow.com', icon: '💬', desc: 'Q&A' },
+    { id: 4, name: 'GeeksForGeeks', url: 'https://geeksforgeeks.org', icon: '🤓', desc: 'CS resources' },
+  ]),
+  streak: S.get('nh_streak', { count: 0, lastDate: '' }),
+  studyGoal: S.get('nh_goal', 5),
+  studyToday: S.get('nh_today', 0),
+  profile: S.get('nh_profile', { name: 'Nicholas', email: 'nicholas@email.com', uni: 'University of Zambia', year: '2nd Year', github: 'github.com/nicholas', major: 'Computer Science' }),
+  calMonth: new Date().getMonth(),
+  calYear: new Date().getFullYear(),
+};
+
+function save() {
+  S.set('nh_tasks', state.tasks);
+  S.set('nh_exams', state.exams);
+  S.set('nh_qnotes', state.quickNotes);
+  S.set('nh_courses', state.courses);
+  S.set('nh_notes', state.notes);
+  S.set('nh_calevents', state.calEvents);
+  S.set('nh_resources', state.resources);
+  S.set('nh_streak', state.streak);
+  S.set('nh_goal', state.studyGoal);
+  S.set('nh_today', state.studyToday);
+  S.set('nh_profile', state.profile);
+}
+
+// ====== NAVIGATION ======
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
+  renderPage(page);
+}
+
+document.getElementById('nav-links').addEventListener('click', e => {
+  if (e.target.dataset.page) {
+    e.preventDefault();
+    navigate(e.target.dataset.page);
+  }
+});
+
+function renderPage(page) {
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'courses') renderCourses();
+  if (page === 'notes') renderNotes();
+  if (page === 'calendar') renderCalendar();
+  if (page === 'resources') renderResources();
+  if (page === 'profile') loadProfile();
+}
+
+// ====== STATUS BAR ======
+function updateClock() {
+  const now = new Date();
+  document.getElementById('sb-time').textContent = now.toLocaleTimeString('en-US', { hour12: false });
+  document.getElementById('sb-date').textContent = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ====== SIDEBAR ======
+function renderSidebar() {
+  // Courses
+  const sc = document.getElementById('sidebar-courses');
+  sc.innerHTML = state.courses.map((c, i) => `
+    <div class="sidebar-item ${i === 0 ? 'active' : ''}" onclick="navigate('courses')">
+      <div class="dot ${['','green','orange',''][i % 4]}"></div>${c.name}
+    </div>
+  `).join('');
+
+  // Deadlines
+  const sd = document.getElementById('sidebar-deadlines');
+  const soon = state.exams.filter(e => {
+    const d = new Date(e.date); const n = new Date();
+    return d > n;
+  }).sort((a, b) => new Date(a.date) - new Date(b.date)).slice(0, 3);
+  sd.innerHTML = soon.map(e => `
+    <div class="sidebar-deadline">
+      ${e.name}
+      <span class="dl-date">${new Date(e.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+    </div>
+  `).join('') || '<div style="font-size:0.8rem;color:var(--text-dim)">No upcoming deadlines</div>';
+}
+
+// ====== TASKS ======
+function renderTasks() {
+  const list = document.getElementById('task-list');
+  if (!list) return;
+  list.innerHTML = state.tasks.length === 0
+    ? '<div style="color:var(--text-dim);font-size:0.85rem;padding:0.5rem 0;">No tasks. You\'re either very productive or very lazy.</div>'
+    : state.tasks.map(t => `
+      <div class="task-item">
+        <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${t.id})"/>
+        <label onclick="toggleTask(${t.id})">${t.text}</label>
+        <button class="btn red sm" onclick="deleteTask(${t.id})">✕</button>
+      </div>
+    `).join('');
+}
+
+function addTask() {
+  const inp = document.getElementById('task-input');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  state.tasks.push({ id: Date.now(), text: txt, done: false });
+  inp.value = '';
+  save(); renderTasks(); toast('Task added ✓');
+}
+
+function toggleTask(id) {
+  const t = state.tasks.find(t => t.id === id);
+  if (t) { t.done = !t.done; save(); renderTasks(); }
+}
+
+function deleteTask(id) {
+  state.tasks = state.tasks.filter(t => t.id !== id);
+  save(); renderTasks();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.activeElement.id === 'task-input') addTask();
+  if (e.key === 'Enter' && document.activeElement.id === 'quick-note-input') addQuickNote(0);
+});
+
+// ====== EXAMS ======
+function renderExams() {
+  const list = document.getElementById('exam-list');
+  if (!list) return;
+  const now = new Date();
+  const sorted = [...state.exams].sort((a, b) => new Date(a.date) - new Date(b.date));
+  list.innerHTML = sorted.map(e => {
+    const d = new Date(e.date + 'T00:00:00');
+    const diff = Math.ceil((d - now) / 86400000);
+    const label = diff < 0 ? 'PAST' : diff === 0 ? 'TODAY' : `${diff}d`;
+    return `
+      <div class="exam-item">
+        <div>
+          <div style="font-weight:600;">${e.name}</div>
+          <div class="exam-date">${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <span class="exam-countdown ${diff <= 7 && diff >= 0 ? 'soon' : ''}">${label}</span>
+          <button class="btn red sm" onclick="deleteExam(${e.id})">✕</button>
+        </div>
+      </div>`;
+  }).join('') || '<div style="color:var(--text-dim);font-size:0.85rem;">No exams. Lucky you.</div>';
+}
+
+function addExam() {
+  const name = document.getElementById('exam-name-input').value.trim();
+  const date = document.getElementById('exam-date-input').value;
+  if (!name || !date) return toast('Fill in both fields!');
+  state.exams.push({ id: Date.now(), name, date });
+  document.getElementById('exam-name-input').value = '';
+  document.getElementById('exam-date-input').value = '';
+  save(); renderExams(); renderSidebar(); toast('Exam added ✓');
+}
+
+function deleteExam(id) {
+  state.exams = state.exams.filter(e => e.id !== id);
+  save(); renderExams(); renderSidebar();
+}
+
+// ====== QUICK NOTES ======
+function renderQuickNotes() {
+  const g = document.getElementById('quick-notes-grid');
+  if (!g) return;
+  g.innerHTML = state.quickNotes.map(n => `
+    <div class="sticky-note ${n.type === 1 ? 'type2' : ''}">
+      <button class="del-note" onclick="deleteQuickNote(${n.id})">✕</button>
+      ${n.text}
+    </div>
+  `).join('') || '<div style="color:var(--text-dim);font-size:0.8rem;">No notes yet...</div>';
+}
+
+function addQuickNote(type) {
+  const inp = document.getElementById('quick-note-input');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  state.quickNotes.push({ id: Date.now(), text: txt, type });
+  inp.value = '';
+  save(); renderQuickNotes(); toast('Note added ✓');
+}
+
+function deleteQuickNote(id) {
+  state.quickNotes = state.quickNotes.filter(n => n.id !== id);
+  save(); renderQuickNotes();
+}
+
+// ====== STREAK & PROGRESS ======
+function renderProgress() {
+  document.getElementById('streak-num').textContent = state.streak.count;
+  document.getElementById('study-goal').value = state.studyGoal;
+  document.getElementById('study-today').value = state.studyToday;
+
+  const bars = document.getElementById('course-progress-bars');
+  if (bars) {
+    bars.innerHTML = state.courses.map(c => `
+      <div class="progress-stat">
+        <div class="progress-label"><span>${c.name}</span><span>${c.progress}%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${c.progress}%"></div></div>
+      </div>
+    `).join('');
+  }
+
+  const dp = document.getElementById('daily-progress');
+  if (dp) {
+    const pct = Math.min(100, Math.round((state.studyToday / state.studyGoal) * 100));
+    dp.innerHTML = `
+      <div class="progress-label"><span>Daily Goal</span><span>${state.studyToday}h / ${state.studyGoal}h</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:linear-gradient(90deg,var(--accent3),var(--warn))"></div></div>
+    `;
+  }
+}
+
+function logStudy() {
+  const today = new Date().toDateString();
+  if (state.streak.lastDate === today) return toast('Already logged today!');
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  state.streak.count = state.streak.lastDate === yesterday ? state.streak.count + 1 : 1;
+  state.streak.lastDate = today;
+  save(); renderProgress(); toast(`🔥 ${state.streak.count} day streak!`);
+}
+
+function saveGoal() {
+  state.studyGoal = parseFloat(document.getElementById('study-goal').value) || 5;
+  save(); renderProgress();
+}
+function saveToday() {
+  state.studyToday = parseFloat(document.getElementById('study-today').value) || 0;
+  save(); renderProgress();
+}
+
+// ====== MINI CALENDAR ======
+function renderMiniCalendar() {
+  const el = document.getElementById('mini-calendar');
+  if (!el) return;
+  const days = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  const now = new Date();
+  // Get this week Mon-Sun
+  const dow = now.getDay(); // 0=Sun
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - ((dow + 6) % 7));
+
+  let html = '<div class="calendar-grid">';
+  days.forEach(d => html += `<div class="cal-header">${d}</div>`);
+
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(monday);
+    day.setDate(monday.getDate() + i);
+    const isToday = day.toDateString() === now.toDateString();
+    const dateStr = day.toISOString().split('T')[0];
+    const events = [...state.exams.filter(e => e.date === dateStr), ...state.calEvents.filter(e => e.date === dateStr)];
+    html += `<div class="cal-day ${isToday ? 'today' : ''}">
+      <div class="cal-day-num">${day.getDate()}</div>
+      ${events.map(e => `<div class="cal-event ${state.exams.find(ex => ex.id === e.id) ? 'warn' : ''}">${e.name}</div>`).join('')}
+    </div>`;
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// ====== FULL CALENDAR ======
+function renderCalendar() {
+  const el = document.getElementById('full-calendar');
+  if (!el) return;
+  const months = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  document.getElementById('cal-title').textContent = `${months[state.calMonth]} ${state.calYear}`;
+
+  const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  const firstDay = new Date(state.calYear, state.calMonth, 1).getDay();
+  const daysInMonth = new Date(state.calYear, state.calMonth + 1, 0).getDate();
+  const now = new Date();
+
+  let html = '<div class="calendar-grid">';
+  days.forEach(d => html += `<div class="cal-header">${d}</div>`);
+
+  for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${state.calYear}-${String(state.calMonth + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = now.getFullYear() === state.calYear && now.getMonth() === state.calMonth && now.getDate() === d;
+    const events = [...state.exams.filter(e => e.date === dateStr), ...state.calEvents.filter(e => e.date === dateStr)];
+    html += `<div class="cal-day ${isToday ? 'today' : ''}">
+      <div class="cal-day-num">${d}</div>
+      ${events.map(e => `<div class="cal-event ${state.exams.find(ex => ex.id === e.id) ? 'warn' : ''}">${e.name}</div>`).join('')}
+    </div>`;
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function prevMonth() {
+  state.calMonth--;
+  if (state.calMonth < 0) { state.calMonth = 11; state.calYear--; }
+  renderCalendar();
+}
+function nextMonth() {
+  state.calMonth++;
+  if (state.calMonth > 11) { state.calMonth = 0; state.calYear++; }
+  renderCalendar();
+}
+
+function addCalEvent() {
+  const name = document.getElementById('cal-event-input').value.trim();
+  const date = document.getElementById('cal-event-date').value;
+  if (!name || !date) return toast('Fill in both fields!');
+  state.calEvents.push({ id: Date.now(), name, date });
+  document.getElementById('cal-event-input').value = '';
+  document.getElementById('cal-event-date').value = '';
+  save(); renderCalendar(); toast('Event added ✓');
+}
+
+// ====== COURSES ======
+function renderCourses() {
+  renderSidebar();
+  const g = document.getElementById('courses-grid');
+  if (!g) return;
+  const colors = ['c1','c2','c3','c4'];
+  g.innerHTML = state.courses.map((c, i) => `
+    <div class="course-card ${colors[i % 4]}">
+      <div class="course-name">${c.name}</div>
+      <div class="course-code">${c.code}</div>
+      <div class="course-prog-label"><span>Progress</span><span>${c.progress}%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${c.progress}%"></div></div>
+      <div style="display:flex;gap:0.5rem;margin-top:0.8rem;align-items:center;">
+        <input type="range" min="0" max="100" value="${c.progress}" style="flex:1;accent-color:var(--accent);" onchange="updateCourseProgress(${c.id}, this.value)"/>
+        <button class="btn red sm" onclick="deleteCourse(${c.id})">✕</button>
+      </div>
+    </div>
+  `).join('') || '<div style="color:var(--text-dim);">No courses yet. Add one above.</div>';
+}
+
+function addCourse() {
+  const name = document.getElementById('course-name-input').value.trim();
+  const code = document.getElementById('course-code-input').value.trim();
+  if (!name) return;
+  state.courses.push({ id: Date.now(), name, code: code || 'N/A', progress: 0 });
+  document.getElementById('course-name-input').value = '';
+  document.getElementById('course-code-input').value = '';
+  save(); renderCourses(); renderProgress(); toast('Course added ✓');
+}
+
+function updateCourseProgress(id, val) {
+  const c = state.courses.find(c => c.id === id);
+  if (c) { c.progress = parseInt(val); save(); renderProgress(); }
+}
+
+function deleteCourse(id) {
+  state.courses = state.courses.filter(c => c.id !== id);
+  save(); renderCourses(); renderProgress();
+}
+
+// ====== NOTES PAGE ======
+function renderNotes() {
+  const g = document.getElementById('notes-page-grid');
+  if (!g) return;
+  g.innerHTML = state.notes.map(n => `
+    <div class="note-card">
+      <div class="note-card-title">${n.title || 'Untitled'}</div>
+      <div class="note-card-body">${n.body}</div>
+      <div class="note-card-date">${new Date(n.created).toLocaleDateString()}</div>
+      <button class="btn red sm" style="margin-top:0.5rem;" onclick="deleteNote(${n.id})">DELETE</button>
+    </div>
+  `).join('') || '<div style="color:var(--text-dim);font-size:0.85rem;">No notes yet. Write something.</div>';
+}
+
+function saveNote() {
+  const title = document.getElementById('note-title-input').value.trim();
+  const body = document.getElementById('note-body-input').value.trim();
+  if (!body) return toast('Note body is empty!');
+  state.notes.unshift({ id: Date.now(), title, body, created: Date.now() });
+  document.getElementById('note-title-input').value = '';
+  document.getElementById('note-body-input').value = '';
+  save(); renderNotes(); toast('Note saved ✓');
+}
+
+function deleteNote(id) {
+  state.notes = state.notes.filter(n => n.id !== id);
+  save(); renderNotes();
+}
+
+// ====== RESOURCES ======
+function renderResources() {
+  const g = document.getElementById('resources-grid');
+  if (!g) return;
+  g.innerHTML = state.resources.map(r => `
+    <a class="resource-card" href="${r.url}" target="_blank">
+      <div class="resource-icon">${r.icon || '🔗'}</div>
+      <div class="resource-name">${r.name}</div>
+      <div class="resource-desc">${r.desc || ''}</div>
+    </a>
+  `).join('');
+}
+
+function addResource() {
+  const name = document.getElementById('res-name').value.trim();
+  const url = document.getElementById('res-url').value.trim();
+  const icon = document.getElementById('res-icon').value.trim();
+  if (!name || !url) return toast('Name and URL required!');
+  state.resources.push({ id: Date.now(), name, url, icon: icon || '🔗', desc: '' });
+  document.getElementById('res-name').value = '';
+  document.getElementById('res-url').value = '';
+  document.getElementById('res-icon').value = '';
+  save(); renderResources(); toast('Resource added ✓');
+}
+
+// ====== PROFILE ======
+function loadProfile() {
+  const p = state.profile;
+  document.getElementById('p-name').value = p.name || '';
+  document.getElementById('p-email').value = p.email || '';
+  document.getElementById('p-uni').value = p.uni || '';
+  document.getElementById('p-year').value = p.year || '';
+  document.getElementById('p-github').value = p.github || '';
+  document.getElementById('p-major').value = p.major || '';
+  updateProfileDisplay();
+}
+
+function updateProfile() {
+  state.profile = {
+    name: document.getElementById('p-name').value,
+    email: document.getElementById('p-email').value,
+    uni: document.getElementById('p-uni').value,
+    year: document.getElementById('p-year').value,
+    github: document.getElementById('p-github').value,
+    major: document.getElementById('p-major').value,
+  };
+  updateProfileDisplay();
+}
+
+function updateProfileDisplay() {
+  const p = state.profile;
+  document.getElementById('profile-name-display').textContent = p.name || 'User';
+  document.getElementById('profile-uni-display').textContent = p.uni || '';
+  document.getElementById('profile-email-display').textContent = p.email || '';
+  document.getElementById('avatar-display').textContent = (p.name || 'N')[0].toUpperCase();
+}
+
+function saveProfile() {
+  save(); toast('Profile saved ✓');
+}
+
+// ====== CALCULATOR ======
+function openCalc() {
+  document.getElementById('calc-modal').classList.add('open');
+  const disp = document.getElementById('calc-display');
+  const btns = [
+    'C','(',')','/','7','8','9','*','4','5','6','-','1','2','3','+','0','.','=','⌫'
+  ];
+  let expr = '';
+  document.getElementById('calc-btns').innerHTML = btns.map(b => `
+    <button class="btn sm" style="width:100%;text-align:center;padding:0.5rem 0;" onclick="calcPress('${b}')">${b}</button>
+  `).join('');
+  window.calcPress = (b) => {
+    if (b === 'C') { expr = ''; }
+    else if (b === '⌫') { expr = expr.slice(0, -1); }
+    else if (b === '=') {
+      try { expr = String(eval(expr)); } catch { expr = 'ERR'; }
+    } else { expr += b; }
+    disp.value = expr || '0';
+  };
+}
+
+document.getElementById('calc-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('calc-modal')) document.getElementById('calc-modal').classList.remove('open');
+});
+
+// ====== TOAST ======
+function toast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+// ====== DASHBOARD RENDER ======
+function renderDashboard() {
+  renderTasks();
+  renderExams();
+  renderQuickNotes();
+  renderProgress();
+  renderMiniCalendar();
+}
+
+// ====== INIT ======
+renderSidebar();
+renderDashboard();
+</script>
+</body>
+</html>
