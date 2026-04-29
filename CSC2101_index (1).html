@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC 2101 — Computer Systems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+:root {
+  --bg-color: #f8f9fa;
+  --surface-color: #ffffff;
+  --text-primary: #2b2d42;
+  --text-secondary: #6c757d;
+  --accent-primary: #1d3557;
+  --accent-secondary: #457b9d;
+  --accent-highlight: #e63946;
+  --border-color: #dee2e6;
+  --success-color: #2a9d8f;
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'Courier New', Courier, monospace;
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-hover: 0 8px 24px rgba(0,0,0,0.12);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --nav-width: 280px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  line-height: 1.6;
+  display: flex;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e9ecef' fill-opacity='0.4' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: -1;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--accent-primary);
+  line-height: 1.2;
+}
+
+a { color: inherit; text-decoration: none; transition: all 0.2s ease; }
+a:hover { color: var(--accent-highlight); }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--nav-width);
+  background-color: var(--surface-color);
+  border-right: 1px solid var(--border-color);
+  height: 100vh;
+  position: fixed;
+  left: 0; top: 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  padding: 2.5rem 2rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-header h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
+
+.course-code {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent-highlight);
+  background-color: rgba(230, 57, 70, 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.nav-group-title {
+  padding: 1.5rem 2rem 0.5rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-family: var(--font-body);
+}
+
+.nav-menu { padding: 1rem 0; flex-grow: 1; }
+.nav-item { list-style: none; }
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 2rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--accent-primary);
+  background-color: rgba(69, 123, 157, 0.06);
+  border-left-color: var(--accent-highlight);
+}
+
+.nav-icon { margin-right: 0.9rem; font-size: 1.1rem; width: 22px; text-align: center; }
+
+.nav-badge {
+  margin-left: auto;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: rgba(230, 57, 70, 0.12);
+  color: var(--accent-highlight);
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+}
+
+/* ── MAIN ── */
+.main-content {
+  flex: 1;
+  margin-left: var(--nav-width);
+  padding: 3rem 4rem;
+  max-width: 1400px;
+}
+
+/* ── HERO ── */
+.hero {
+  margin-bottom: 3.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid var(--border-color);
+  animation: fadeInDown 0.7s ease;
+  position: relative;
+}
+
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent-highlight);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.hero-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 32px;
+  height: 2px;
+  background: var(--accent-highlight);
+}
+
+.hero h1 {
+  font-size: 3.2rem;
+  line-height: 1.1;
+  margin-bottom: 1.2rem;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent-secondary);
+}
+
+.hero-description {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  max-width: 680px;
+  margin-bottom: 2rem;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 2.5rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-number {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.3rem;
+}
+
+/* ── SECTION HEADER ── */
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 1.8rem;
+}
+
+.section-title {
+  font-size: 1.6rem;
+}
+
+.section-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-weight: 400;
+}
+
+/* ── TOPICS GRID ── */
+.topics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+  animation: fadeInUp 0.7s ease 0.15s backwards;
+}
+
+/* ── TOPIC CARD ── */
+.topic-card {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.8rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.topic-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--card-accent, var(--accent-secondary));
+  border-radius: 4px 0 0 4px;
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.3s ease;
+}
+
+.topic-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--accent-secondary);
+}
+
+.topic-card:hover::before { transform: scaleY(1); }
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.2rem;
+}
+
+.card-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: var(--icon-bg, rgba(69,123,157,0.1));
+  color: var(--card-accent, var(--accent-secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+}
+
+.card-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 0.25rem 0.7rem;
+  border-radius: 20px;
+  background: #f1f3f5;
+  color: var(--text-secondary);
+}
+
+.card-tag.hot {
+  background: rgba(230,57,70,0.1);
+  color: var(--accent-highlight);
+}
+
+.card-tag.core {
+  background: rgba(29,53,87,0.1);
+  color: var(--accent-primary);
+}
+
+.card-title {
+  font-size: 1.2rem;
+  margin-bottom: 0.6rem;
+  color: var(--accent-primary);
+}
+
+.card-text {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  margin-bottom: 1.2rem;
+  flex-grow: 1;
+  line-height: 1.7;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.card-meta {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.card-action {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--card-accent, var(--accent-secondary));
+  gap: 0.4rem;
+  transition: gap 0.2s ease;
+}
+
+.topic-card:hover .card-action { gap: 0.7rem; }
+
+/* ── EXAM TIPS SECTION ── */
+.tips-section {
+  background: var(--accent-primary);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  color: white;
+  margin-bottom: 3rem;
+  animation: fadeInUp 0.7s ease 0.3s backwards;
+  position: relative;
+  overflow: hidden;
+}
+
+.tips-section::after {
+  content: '📋';
+  position: absolute;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 6rem;
+  opacity: 0.07;
+}
+
+.tips-section h3 {
+  color: white;
+  font-size: 1.4rem;
+  margin-bottom: 1.2rem;
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.tip-item {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.2rem;
+}
+
+.tip-topic {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 0.3rem;
+}
+
+.tip-value {
+  font-size: 1.5rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: #a8dadc;
+}
+
+.tip-desc {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.65);
+  margin-top: 0.2rem;
+}
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border-color);
+  padding-top: 2rem;
+  margin-top: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: fadeInUp 0.7s ease 0.4s backwards;
+}
+
+footer span { font-family: var(--font-mono); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── MOBILE HAMBURGER ── */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 1rem; left: 1rem;
+  z-index: 1100;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  width: 40px; height: 40px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  box-shadow: var(--shadow-md);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 992px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .main-content { margin-left: 0; padding: 5rem 1.5rem 2rem; }
+  .hero h1 { font-size: 2.2rem; }
+  .hamburger { display: flex; }
+  .hero-stats { gap: 1.5rem; }
+  .tips-section::after { display: none; }
+}
+
+@media (max-width: 600px) {
+  .topics-grid { grid-template-columns: 1fr; }
+  footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- Hamburger -->
+<button class="hamburger" id="hamburger" aria-label="Toggle menu">☰</button>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h2>Computer Systems</h2>
+    <span class="course-code">CSC 2101</span>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-top:0.7rem;">University of Zambia · Year 1 · 15 Credits</p>
+  </div>
+
+  <nav>
+    <p class="nav-group-title">Overview</p>
+    <ul class="nav-menu">
+      <li class="nav-item">
+        <a href="#home" class="nav-link active">
+          <span class="nav-icon">🏠</span> Home
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#topics" class="nav-link">
+          <span class="nav-icon">📚</span> All Topics
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#exam-tips" class="nav-link">
+          <span class="nav-icon">🎯</span> Exam Focus
+        </a>
+      </li>
+    </ul>
+
+    <p class="nav-group-title">Lessons</p>
+    <ul class="nav-menu">
+      <li class="nav-item">
+        <a href="topic1-number-systems.html" class="nav-link">
+          <span class="nav-icon">🔢</span> Number Systems
+          <span class="nav-badge">HOT</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="topic2-hardware.html" class="nav-link">
+          <span class="nav-icon">🖥️</span> Computer Hardware
+          <span class="nav-badge">HOT</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="topic3-cpu.html" class="nav-link">
+          <span class="nav-icon">⚙️</span> CPU & Processing
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="topic4-memory.html" class="nav-link">
+          <span class="nav-icon">💾</span> Memory & Storage
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="topic5-os.html" class="nav-link">
+          <span class="nav-icon">🪟</span> Operating Systems
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="topic6-networking.html" class="nav-link">
+          <span class="nav-icon">🌐</span> Networking & TCP/IP
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="topic7-spreadsheets.html" class="nav-link">
+          <span class="nav-icon">📊</span> Spreadsheets
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="topic8-databases.html" class="nav-link">
+          <span class="nav-icon">🗄️</span> Databases
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="topic9-security.html" class="nav-link">
+          <span class="nav-icon">🔐</span> Security & Malware
+        </a>
+      </li>
+    </ul>
+
+    <p class="nav-group-title">Resources</p>
+    <ul class="nav-menu">
+      <li class="nav-item">
+        <a href="past-questions.html" class="nav-link">
+          <span class="nav-icon">📝</span> Past Questions
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="glossary.html" class="nav-link">
+          <span class="nav-icon">📖</span> Glossary
+        </a>
+      </li>
+    </ul>
+  </nav>
+</aside>
+
+<!-- ── MAIN ── -->
+<main class="main-content" id="home">
+
+  <!-- HERO -->
+  <header class="hero">
+    <p class="hero-eyebrow">University of Zambia · School of Natural Sciences</p>
+    <h1>Computer <em>Systems</em><br>Study Guide</h1>
+    <p class="hero-description">
+      Everything you need to ace CSC 2101 — interactive lessons, past exam questions,
+      and topic breakdowns built from 10 years of past papers.
+    </p>
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-number">9</span>
+        <span class="stat-label">Topics</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">80+</span>
+        <span class="stat-label">Past Questions</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">2015–25</span>
+        <span class="stat-label">Exam Coverage</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">15</span>
+        <span class="stat-label">Credits</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- EXAM FOCUS BANNER -->
+  <section class="tips-section" id="exam-tips">
+    <h3>🎯 What the Exam Actually Tests</h3>
+    <div class="tips-grid">
+      <div class="tip-item">
+        <p class="tip-topic">Binary / Number Systems</p>
+        <p class="tip-value">Every Exam</p>
+        <p class="tip-desc">Conversions appear in 100% of papers</p>
+      </div>
+      <div class="tip-item">
+        <p class="tip-topic">CPU & Hardware</p>
+        <p class="tip-value">30+ marks</p>
+        <p class="tip-desc">FDE cycle, ALU, CU, Registers</p>
+      </div>
+      <div class="tip-item">
+        <p class="tip-topic">Operating Systems</p>
+        <p class="tip-value">8–10 marks</p>
+        <p class="tip-desc">Functions, file systems, GUI</p>
+      </div>
+      <div class="tip-item">
+        <p class="tip-topic">Databases</p>
+        <p class="tip-value">30 marks</p>
+        <p class="tip-desc">Tables, queries, primary/foreign keys</p>
+      </div>
+      <div class="tip-item">
+        <p class="tip-topic">Networking</p>
+        <p class="tip-value">Recurring</p>
+        <p class="tip-desc">TCP/IP layers, topologies</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOPICS -->
+  <section id="topics">
+    <div class="section-header">
+      <h2 class="section-title">All Topics</h2>
+      <span class="section-subtitle">Click any card to open the lesson</span>
+    </div>
+
+    <div class="topics-grid">
+
+      <!-- T1 -->
+      <a href="topic1-number-systems.html" class="topic-card" style="--card-accent:#e63946;--icon-bg:rgba(230,57,70,0.1)">
+        <div class="card-top">
+          <div class="card-icon">🔢</div>
+          <span class="card-tag hot">Every Exam</span>
+        </div>
+        <h3 class="card-title">Number Systems &amp; Binary</h3>
+        <p class="card-text">Binary, decimal, hexadecimal conversions. Arithmetic operations in binary. The language computers actually speak.</p>
+        <div class="card-footer">
+          <span class="card-meta">Topic 1 · 12 past questions</span>
+          <span class="card-action">Start →</span>
+        </div>
+      </a>
+
+      <!-- T2 -->
+      <a href="topic2-hardware.html" class="topic-card" style="--card-accent:#1d3557;--icon-bg:rgba(29,53,87,0.1)">
+        <div class="card-top">
+          <div class="card-icon">🖥️</div>
+          <span class="card-tag core">Core Topic</span>
+        </div>
+        <h3 class="card-title">Computer Hardware</h3>
+        <p class="card-text">Input/output devices, motherboard, ports, HDD vs SSD, storage types. How the physical machine comes together.</p>
+        <div class="card-footer">
+          <span class="card-meta">Topic 2 · 15 past questions</span>
+          <span class="card-action">Start →</span>
+        </div>
+      </a>
+
+      <!-- T3 -->
+      <a href="topic3-cpu.html" class="topic-card" style="--card-accent:#457b9d;--icon-bg:rgba(69,123,157,0.1)">
+        <div class="card-top">
+          <div class="card-icon">⚙️</div>
+          <span class="card-tag hot">High Marks</span>
+        </div>
+        <h3 class="card-title">CPU &amp; Processing</h3>
+        <p class="card-text">Fetch-Decode-Execute cycle, Control Unit, ALU, Registers, Von Neumann architecture. The brain of the machine.</p>
+        <div class="card-footer">
+          <span class="card-meta">Topic 3 · 13 past questions</span>
+          <span class="card-action">Start →</span>
+        </div>
+      </a>
+
+      <!-- T4 -->
+      <a href="topic4-memory.html" class="topic-card" style="--card-accent:#2a9d8f;--icon-bg:rgba(42,157,143,0.1)">
+        <div class="card-top">
+          <div class="card-icon">💾</div>
+          <span class="card-tag">Memory</span>
+        </div>
+        <h3 class="card-title">Memory &amp; Storage</h3>
+        <p class="card-text">RAM vs ROM, DRAM vs SRAM, volatile vs non-volatile memory. Cache levels. The difference between speed and permanence.</p>
+        <div class="card-footer">
+          <span class="card-meta">Topic 4 · 9 past questions</span>
+          <span class="card-action">Start →</span>
+        </div>
+      </a>
+
+      <!-- T5 -->
+      <a href="topic5-os.html" class="topic-card" style="--card-accent:#6a0572;--icon-bg:rgba(106,5,114,0.08)">
+        <div class="card-top">
+          <div class="card-icon">🪟</div>
+          <span class="card-tag core">Core Topic</span>
+        </div>
+        <h3 class="card-title">Operating Systems</h3>
+        <p class="card-text">OS functions, file management, GUI vs CLI, Windows vs Linux, file attributes, directories and paths.</p>
+        <div class="card-footer">
+          <span class="card-meta">Topic 5 · 25 past questions</span>
+          <span class="card-action">Start →</span>
+        </div>
+      </a>
+
+      <!-- T6 -->
+      <a href="topic6-networking.html" class="topic-card" style="--card-accent:#f4a261;--icon-bg:rgba(244,162,97,0.1)">
+        <div class="card-top">
+          <div class="card-icon">🌐</div>
+          <span class="card-tag">Networking</span>
+        </div>
+        <h3 class="card-title">Networking &amp; TCP/IP</h3>
+        <p class="card-text">TCP/IP model layers, OSI model, network types, packet switching, topologies. How the internet actually works.</p>
+        <div class="card-footer">
+          <span class="card-meta">Topic 6 · 14 past questions</span>
+          <span class="card-action">Start →</span>
+        </div>
+      </a>
+
+      <!-- T7 -->
+      <a href="topic7-spreadsheets.html" class="topic-card" style="--card-accent:#2a9d8f;--icon-bg:rgba(42,157,143,0.08)">
+        <div class="card-top">
+          <div class="card-icon">📊</div>
+          <span class="card-tag">Practical</span>
+        </div>
+        <h3 class="card-title">Spreadsheets</h3>
+        <p class="card-text">SUM, AVERAGE, MIN, MAX, IF, COUNTIF, VLOOKUP. Cell referencing. Charts. The formulas your exam loves.</p>
+        <div class="card-footer">
+          <span class="card-meta">Topic 7 · 11 past questions</span>
+          <span class="card-action">Start →</span>
+        </div>
+      </a>
+
+      <!-- T8 -->
+      <a href="topic8-databases.html" class="topic-card" style="--card-accent:#e63946;--icon-bg:rgba(230,57,70,0.08)">
+        <div class="card-top">
+          <div class="card-icon">🗄️</div>
+          <span class="card-tag hot">30 Marks</span>
+        </div>
+        <h3 class="card-title">Databases</h3>
+        <p class="card-text">Tables, queries, forms, reports. Primary vs foreign keys. Relational concepts. Straight from your 2025 exam paper.</p>
+        <div class="card-footer">
+          <span class="card-meta">Topic 8 · 8 past questions</span>
+          <span class="card-action">Start →</span>
+        </div>
+      </a>
+
+      <!-- T9 -->
+      <a href="topic9-security.html" class="topic-card" style="--card-accent:#6c757d;--icon-bg:rgba(108,117,125,0.1)">
+        <div class="card-top">
+          <div class="card-icon">🔐</div>
+          <span class="card-tag">Security</span>
+        </div>
+        <h3 class="card-title">Security &amp; Malware</h3>
+        <p class="card-text">Adware, ransomware, rootkits, spyware, worms. Troubleshooting steps. Safety procedures when handling hardware.</p>
+        <div class="card-footer">
+          <span class="card-meta">Topic 9 · 7 past questions</span>
+          <span class="card-action">Start →</span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <footer>
+    <p>CSC 2101 · University of Zambia · Built for exam prep 2025</p>
+    <span>Nicholas · github.com</span>
+  </footer>
+
+</main>
+
+<script>
+  // Sidebar toggle for mobile
+  const hamburger = document.getElementById('hamburger');
+  const sidebar = document.getElementById('sidebar');
+
+  hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+  });
+
+  // Close sidebar when clicking a link on mobile
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 992) {
+        sidebar.classList.remove('open');
+      }
+    });
+  });
+
+  // Smooth scroll for in-page nav links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // Highlight active nav based on scroll
+  const sections = document.querySelectorAll('section[id], header[id], main[id]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(section => {
+      if (window.scrollY >= section.offsetTop - 100) {
+        current = section.getAttribute('id');
+      }
+    });
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === `#${current}`) {
+        link.classList.add('active');
+      }
+    });
+  });
+</script>
+</body>
+</html>

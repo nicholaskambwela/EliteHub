@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operating Systems — CSC 2101</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #21262d;
+  --border: #30363d;
+  --text: #e6edf3;
+  --text-muted: #8b949e;
+  --accent: #58a6ff;
+  --accent2: #3fb950;
+  --accent3: #f78166;
+  --accent4: #d2a8ff;
+  --accent5: #ffa657;
+  --highlight: #e63946;
+  --font-head: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'Courier New', monospace;
+  --nav-w: 270px;
+  --radius: 10px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  min-height: 100vh;
+  line-height: 1.7;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--nav-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.sidebar-brand {
+  padding: 1.8rem 1.5rem 1.2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  margin-bottom: 1rem;
+  transition: color 0.2s;
+}
+.back-link:hover { color: var(--accent); }
+
+.sidebar-brand h3 {
+  font-family: var(--font-head);
+  font-size: 1.15rem;
+  color: var(--text);
+  margin-bottom: 0.3rem;
+}
+
+.topic-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  background: rgba(88,166,255,0.15);
+  color: var(--accent);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid rgba(88,166,255,0.3);
+}
+
+.nav-section-title {
+  padding: 1.2rem 1.5rem 0.4rem;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.nav-list { list-style: none; padding: 0 0.6rem; }
+
+.nav-item a {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 6px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.87rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.nav-item a:hover, .nav-item a.active {
+  background: rgba(88,166,255,0.1);
+  color: var(--accent);
+}
+
+.nav-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.nav-item a.active .nav-dot,
+.nav-item a:hover .nav-dot { background: var(--accent); }
+
+.progress-bar-wrap {
+  margin: 1.5rem 1.5rem 0;
+  padding: 1rem 1.2rem;
+  background: var(--surface2);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.progress-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 0.6rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.progress-track {
+  height: 5px;
+  background: var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 10px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* ── MAIN ── */
+.main {
+  margin-left: var(--nav-w);
+  flex: 1;
+  padding: 3rem 3.5rem;
+  max-width: 1100px;
+}
+
+/* ── SECTION ── */
+.lesson-section {
+  margin-bottom: 4rem;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: fadeUp 0.5s ease forwards;
+}
+
+.lesson-section:nth-child(1) { animation-delay: 0.05s; }
+.lesson-section:nth-child(2) { animation-delay: 0.1s; }
+.lesson-section:nth-child(3) { animation-delay: 0.15s; }
+.lesson-section:nth-child(4) { animation-delay: 0.2s; }
+.lesson-section:nth-child(5) { animation-delay: 0.25s; }
+.lesson-section:nth-child(6) { animation-delay: 0.3s; }
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Hero */
+.lesson-hero {
+  padding: 2.5rem;
+  background: linear-gradient(135deg, #1c2333 0%, #161b22 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin-bottom: 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.lesson-hero::before {
+  content: '🪟';
+  position: absolute;
+  right: 2rem; top: 50%;
+  transform: translateY(-50%);
+  font-size: 7rem;
+  opacity: 0.06;
+}
+
+.lesson-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+
+.lesson-hero h1 {
+  font-family: var(--font-head);
+  font-size: 2.8rem;
+  color: var(--text);
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+.lesson-hero h1 em { color: var(--accent); font-style: italic; }
+
+.lesson-hero p {
+  color: var(--text-muted);
+  font-size: 1rem;
+  max-width: 600px;
+  margin-bottom: 1.5rem;
+}
+
+.hero-tags { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+
+.tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  border: 1px solid;
+}
+
+.tag-blue { background: rgba(88,166,255,0.1); color: var(--accent); border-color: rgba(88,166,255,0.3); }
+.tag-green { background: rgba(63,185,80,0.1); color: var(--accent2); border-color: rgba(63,185,80,0.3); }
+.tag-red { background: rgba(230,57,70,0.1); color: var(--highlight); border-color: rgba(230,57,70,0.3); }
+.tag-purple { background: rgba(210,168,255,0.1); color: var(--accent4); border-color: rgba(210,168,255,0.3); }
+.tag-orange { background: rgba(255,166,87,0.1); color: var(--accent5); border-color: rgba(255,166,87,0.3); }
+
+/* Section headings */
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.5rem;
+}
+
+.section-heading {
+  font-family: var(--font-head);
+  font-size: 1.9rem;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Info cards */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.4rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.info-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.info-card-icon { font-size: 1.8rem; margin-bottom: 0.7rem; }
+.info-card-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--text); }
+.info-card-text { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+
+/* Callout */
+.callout {
+  padding: 1.2rem 1.5rem;
+  border-radius: var(--radius);
+  margin: 1.2rem 0;
+  border-left: 4px solid;
+  font-size: 0.9rem;
+}
+
+.callout-blue { background: rgba(88,166,255,0.08); border-color: var(--accent); color: #b3d4ff; }
+.callout-green { background: rgba(63,185,80,0.08); border-color: var(--accent2); color: #9be9a8; }
+.callout-red { background: rgba(230,57,70,0.08); border-color: var(--highlight); color: #ffa0a7; }
+.callout-orange { background: rgba(255,166,87,0.08); border-color: var(--accent5); color: #ffd0a0; }
+
+.callout strong { display: block; margin-bottom: 0.3rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.07em; opacity: 0.7; }
+
+/* Comparison table */
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  margin: 1.2rem 0;
+}
+
+.compare-table th {
+  background: var(--surface2);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 0.8rem 1rem;
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+}
+
+.compare-table td {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  vertical-align: top;
+}
+
+.compare-table tr:hover td { background: rgba(255,255,255,0.02); color: var(--text); }
+.compare-table td:first-child { color: var(--text); font-weight: 500; }
+
+/* OS Cards */
+.os-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1.2rem 0;
+}
+
+.os-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.os-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+.os-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+.os-name { font-weight: 700; font-size: 1rem; margin-bottom: 0.5rem; }
+.os-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
+
+/* Accordion */
+.accordion { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin: 1rem 0; }
+
+.accordion-item { border-bottom: 1px solid var(--border); }
+.accordion-item:last-child { border-bottom: none; }
+
+.accordion-header {
+  width: 100%;
+  background: var(--surface);
+  color: var(--text);
+  border: none;
+  padding: 1rem 1.4rem;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-body);
+  font-size: 0.93rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.accordion-header:hover { background: var(--surface2); }
+.accordion-header.open { background: var(--surface2); color: var(--accent); }
+
+.accordion-arrow {
+  font-size: 0.8rem;
+  transition: transform 0.3s;
+}
+.accordion-header.open .accordion-arrow { transform: rotate(180deg); }
+
+.accordion-body {
+  display: none;
+  padding: 1.2rem 1.4rem;
+  background: rgba(0,0,0,0.2);
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+  border-top: 1px solid var(--border);
+}
+
+.accordion-body.open { display: block; }
+
+/* FDE Steps */
+.fde-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1.2rem 0;
+}
+
+.fde-step {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.4rem;
+  text-align: center;
+  position: relative;
+}
+
+.step-num {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.85rem;
+  margin: 0 auto 0.8rem;
+}
+
+.step-fetch .step-num { background: rgba(88,166,255,0.2); color: var(--accent); }
+.step-decode .step-num { background: rgba(210,168,255,0.2); color: var(--accent4); }
+.step-execute .step-num { background: rgba(63,185,80,0.2); color: var(--accent2); }
+
+.step-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.5rem; }
+.step-fetch .step-title { color: var(--accent); }
+.step-decode .step-title { color: var(--accent4); }
+.step-execute .step-title { color: var(--accent2); }
+.step-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; }
+
+/* ── QUIZ SECTION ── */
+.quiz-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.quiz-header {
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, rgba(88,166,255,0.12), rgba(210,168,255,0.08));
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.quiz-header h3 {
+  font-family: var(--font-head);
+  font-size: 1.3rem;
+  color: var(--text);
+}
+
+.quiz-meta { font-size: 0.8rem; color: var(--text-muted); }
+
+.quiz-progress-text {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.quiz-body { padding: 2rem; }
+
+.question-block { display: none; }
+.question-block.active { display: block; }
+
+.question-source {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--accent5);
+  margin-bottom: 0.8rem;
+  padding: 0.2rem 0.7rem;
+  background: rgba(255,166,87,0.1);
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.question-text {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.options-list { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 1.5rem; }
+
+.option-btn {
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 1.2rem;
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.option-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--text);
+  background: rgba(88,166,255,0.06);
+}
+
+.option-letter {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.option-btn:hover:not(:disabled) .option-letter {
+  background: var(--accent);
+  color: #000;
+}
+
+.option-btn.correct {
+  border-color: var(--accent2);
+  background: rgba(63,185,80,0.1);
+  color: var(--accent2);
+}
+
+.option-btn.correct .option-letter { background: var(--accent2); color: #000; }
+
+.option-btn.wrong {
+  border-color: var(--highlight);
+  background: rgba(230,57,70,0.1);
+  color: #ffa0a7;
+}
+
+.option-btn.wrong .option-letter { background: var(--highlight); color: white; }
+
+.option-btn:disabled { cursor: default; }
+
+.feedback-box {
+  display: none;
+  padding: 1rem 1.2rem;
+  border-radius: var(--radius);
+  font-size: 0.88rem;
+  margin-bottom: 1.2rem;
+  line-height: 1.7;
+}
+
+.feedback-box.show { display: block; }
+.feedback-correct { background: rgba(63,185,80,0.1); border: 1px solid rgba(63,185,80,0.3); color: #9be9a8; }
+.feedback-wrong { background: rgba(230,57,70,0.1); border: 1px solid rgba(230,57,70,0.3); color: #ffa0a7; }
+
+.feedback-box strong { display: block; margin-bottom: 0.4rem; }
+
+.quiz-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  margin-top: 0.5rem;
+}
+
+.btn {
+  padding: 0.7rem 1.4rem;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #000;
+}
+
+.btn-primary:hover { background: #79b8ff; }
+.btn-primary:disabled { opacity: 0.4; cursor: default; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.btn-ghost:hover { border-color: var(--text-muted); color: var(--text); }
+
+/* Score screen */
+.score-screen {
+  display: none;
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.score-screen.show { display: block; }
+.score-circle {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  border: 4px solid var(--accent);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.score-number {
+  font-family: var(--font-head);
+  font-size: 2.5rem;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.score-total { font-size: 0.8rem; color: var(--text-muted); }
+.score-message { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+.score-sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem; }
+
+/* Past paper section */
+.past-paper-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.pp-header {
+  padding: 1rem 1.4rem;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.pp-year {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--accent5);
+  background: rgba(255,166,87,0.12);
+  border: 1px solid rgba(255,166,87,0.25);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+.pp-marks {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--highlight);
+  background: rgba(230,57,70,0.1);
+  border: 1px solid rgba(230,57,70,0.25);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  margin-left: auto;
+}
+
+.pp-q { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+
+.pp-body {
+  display: none;
+  padding: 1.4rem;
+  font-size: 0.87rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+  border-top: 1px solid var(--border);
+}
+
+.pp-body.open { display: block; }
+
+.model-answer {
+  background: rgba(63,185,80,0.06);
+  border: 1px solid rgba(63,185,80,0.2);
+  border-radius: 8px;
+  padding: 1.2rem;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #9be9a8;
+}
+
+.model-answer strong {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.6rem;
+  color: var(--accent2);
+}
+
+.model-answer ul { padding-left: 1.2rem; }
+.model-answer li { margin-bottom: 0.4rem; }
+
+/* Hamburger */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 1rem; left: 1rem;
+  z-index: 200;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 40px; height: 40px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); transition: 0.3s; }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; padding: 5rem 1.4rem 2rem; }
+  .hamburger { display: flex; }
+  .os-grid { grid-template-columns: 1fr; }
+  .fde-steps { grid-template-columns: 1fr; }
+  .lesson-hero h1 { font-size: 2rem; }
+}
+</style>
+</head>
+<body>
+
+<button class="hamburger" id="hamburger">☰</button>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <a href="CSC2101_index.html" class="back-link">← Back to Home</a>
+    <h3>Operating Systems</h3>
+    <span class="topic-badge">Topic 5 · CSC 2101</span>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-label">
+      <span>Progress</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <p class="nav-section-title">Sections</p>
+  <ul class="nav-list">
+    <li class="nav-item"><a href="#what-is-os" class="nav-link-item">
+      <span class="nav-dot"></span> What is an OS?
+    </a></li>
+    <li class="nav-item"><a href="#os-functions" class="nav-link-item">
+      <span class="nav-dot"></span> OS Functions
+    </a></li>
+    <li class="nav-item"><a href="#types-os" class="nav-link-item">
+      <span class="nav-dot"></span> Types of OS
+    </a></li>
+    <li class="nav-item"><a href="#sys-vs-app" class="nav-link-item">
+      <span class="nav-dot"></span> System vs App Software
+    </a></li>
+    <li class="nav-item"><a href="#cli-vs-gui" class="nav-link-item">
+      <span class="nav-dot"></span> CLI vs GUI
+    </a></li>
+    <li class="nav-item"><a href="#file-management" class="nav-link-item">
+      <span class="nav-dot"></span> File Management
+    </a></li>
+    <li class="nav-item"><a href="#past-papers" class="nav-link-item">
+      <span class="nav-dot"></span> Past Paper Questions
+    </a></li>
+    <li class="nav-item"><a href="#quiz" class="nav-link-item">
+      <span class="nav-dot"></span> Quiz Yourself
+    </a></li>
+  </ul>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="lesson-hero lesson-section">
+    <p class="lesson-eyebrow">CSC 2101 · Topic 5</p>
+    <h1>Operating <em>Systems</em></h1>
+    <p>The invisible manager running everything on your computer. Understand it and you unlock 25+ marks in this exam.</p>
+    <div class="hero-tags">
+      <span class="tag tag-red">8–10 marks in 2025 exam</span>
+      <span class="tag tag-blue">Functions of OS</span>
+      <span class="tag tag-green">File Management</span>
+      <span class="tag tag-purple">CLI vs GUI</span>
+      <span class="tag tag-orange">Windows · Linux · macOS</span>
+    </div>
+  </div>
+
+  <!-- SECTION 1: WHAT IS AN OS -->
+  <section id="what-is-os" class="lesson-section">
+    <p class="section-label">Section 01</p>
+    <h2 class="section-heading">What is an Operating System?</h2>
+
+    <div class="callout callout-blue">
+      <strong>Definition</strong>
+      An Operating System (OS) is system software that acts as an <strong>intermediary between the user and computer hardware</strong>. It manages hardware resources and provides a platform for application software to run.
+    </div>
+
+    <p style="color:var(--text-muted);font-size:0.92rem;margin-bottom:1.2rem;">Think of it this way: your hardware is the kitchen, your apps are the chefs, and the OS is the head chef that assigns stations, manages equipment, and makes sure nobody's fighting over the stove.</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-card-icon">🧑‍💼</div>
+        <div class="info-card-title">Resource Manager</div>
+        <div class="info-card-text">Allocates CPU time, memory, and storage to programs so they don't step on each other.</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🔌</div>
+        <div class="info-card-title">Hardware Abstraction</div>
+        <div class="info-card-text">Apps don't talk to hardware directly — the OS handles that. Your browser doesn't need to know what brand of RAM you have.</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🛡️</div>
+        <div class="info-card-title">Security Gatekeeper</div>
+        <div class="info-card-text">Controls which users and programs can access what. User accounts, permissions, passwords — all OS territory.</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🖥️</div>
+        <div class="info-card-title">User Interface</div>
+        <div class="info-card-text">Provides either a graphical (GUI) or text-based (CLI) interface for users to interact with the computer.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: OS FUNCTIONS -->
+  <section id="os-functions" class="lesson-section">
+    <p class="section-label">Section 02</p>
+    <h2 class="section-heading">The 5 Main Functions of an OS</h2>
+
+    <div class="callout callout-orange">
+      <strong>⚠️ Exam Alert — 2025 Q4a, 2015 Q1b, 2024 Q5</strong>
+      "Explain the main functions of an operating system" — this has appeared in EVERY exam. Know all 5 cold.
+    </div>
+
+    <div class="accordion">
+      <div class="accordion-item">
+        <button class="accordion-header" onclick="toggleAccordion(this)">
+          <span>1. Process Management</span>
+          <span class="accordion-arrow">▼</span>
+        </button>
+        <div class="accordion-body">
+          <p>The OS decides which program runs at what time. Since the CPU can only execute one instruction at a time (mostly), the OS uses <strong>scheduling</strong> to give each program a slice of CPU time.</p>
+          <br>
+          <p><strong>Key terms:</strong> Process, multitasking, scheduling, context switching.</p>
+          <br>
+          <p><em>Exam answer tip:</em> "The OS manages processes by scheduling CPU time, creating and terminating processes, and handling deadlocks."</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header" onclick="toggleAccordion(this)">
+          <span>2. Memory Management</span>
+          <span class="accordion-arrow">▼</span>
+        </button>
+        <div class="accordion-body">
+          <p>The OS allocates and deallocates RAM to programs. It keeps track of which parts of memory are in use and which are free.</p>
+          <br>
+          <p>When RAM runs out, the OS uses <strong>virtual memory</strong> — it temporarily moves less-used data to the hard drive to free up RAM. That's why your computer slows down when you have 50 tabs open.</p>
+          <br>
+          <p><em>Exam answer tip:</em> "The OS allocates RAM to processes, frees memory when processes terminate, and uses virtual memory when RAM is insufficient."</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header" onclick="toggleAccordion(this)">
+          <span>3. File System Management</span>
+          <span class="accordion-arrow">▼</span>
+        </button>
+        <div class="accordion-body">
+          <p>The OS organises data into files and directories (folders). It handles creating, reading, updating, and deleting files. It also manages file permissions — who can read, write, or execute each file.</p>
+          <br>
+          <p><strong>File attributes:</strong> Read-only, Hidden, System, Archive.</p>
+          <br>
+          <p><em>Exam answer tip:</em> "The OS manages the file system by organising files into directories, controlling file access through permissions, and maintaining file metadata."</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header" onclick="toggleAccordion(this)">
+          <span>4. Device Management</span>
+          <span class="accordion-arrow">▼</span>
+        </button>
+        <div class="accordion-body">
+          <p>The OS communicates with hardware devices using <strong>device drivers</strong>. A driver is a small program that tells the OS how to talk to a specific device (printer, mouse, graphics card etc.).</p>
+          <br>
+          <p>Without drivers, your OS wouldn't know what to do with your hardware. That's why you sometimes need to install drivers when you plug in new hardware.</p>
+          <br>
+          <p><em>Exam answer tip:</em> "The OS manages I/O devices through device drivers, coordinates data transfer between devices and the CPU, and handles interrupts."</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header" onclick="toggleAccordion(this)">
+          <span>5. Security & User Management</span>
+          <span class="accordion-arrow">▼</span>
+        </button>
+        <div class="accordion-body">
+          <p>The OS enforces access control — making sure only authorised users can access certain files or run certain programs. It manages user accounts, passwords, and permission levels.</p>
+          <br>
+          <p><strong>Also includes:</strong> protecting against malware, logging system events, and managing network access.</p>
+          <br>
+          <p><em>Exam answer tip:</em> "The OS provides security through user authentication, access control lists, and protection against unauthorised access to system resources."</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: TYPES -->
+  <section id="types-os" class="lesson-section">
+    <p class="section-label">Section 03</p>
+    <h2 class="section-heading">Common Operating Systems</h2>
+
+    <div class="os-grid">
+      <div class="os-card">
+        <div class="os-icon">🪟</div>
+        <div class="os-name" style="color:var(--accent)">Windows</div>
+        <div class="os-desc">Developed by Microsoft. Most widely used desktop OS. GUI-based. Used in homes, schools, businesses. Proprietary (you pay for it).</div>
+      </div>
+      <div class="os-card">
+        <div class="os-icon">🐧</div>
+        <div class="os-name" style="color:var(--accent2)">Linux</div>
+        <div class="os-desc">Open-source. Highly stable. Used heavily in servers. Command-line focused but has GUI versions (Ubuntu, Fedora). Free to use.</div>
+      </div>
+      <div class="os-card">
+        <div class="os-icon">🍎</div>
+        <div class="os-name" style="color:var(--accent4)">macOS</div>
+        <div class="os-desc">Developed by Apple. Unix-based. Only runs on Apple hardware. Known for clean GUI. Used widely in creative industries.</div>
+      </div>
+      <div class="os-card">
+        <div class="os-icon">🤖</div>
+        <div class="os-name" style="color:var(--accent2)">Android</div>
+        <div class="os-desc">Linux-based mobile OS by Google. Open-source. Powers most smartphones worldwide. Touch-based interface.</div>
+      </div>
+      <div class="os-card">
+        <div class="os-icon">📱</div>
+        <div class="os-name" style="color:var(--text-muted)">iOS</div>
+        <div class="os-desc">Apple's mobile OS. Only runs on iPhones/iPads. Closed ecosystem. Known for security and smooth performance.</div>
+      </div>
+      <div class="os-card">
+        <div class="os-icon">⚙️</div>
+        <div class="os-name" style="color:var(--accent5)">Unix</div>
+        <div class="os-desc">The grandfather of modern OS. Highly stable. Foundation for both Linux and macOS. Primarily used in servers and mainframes.</div>
+      </div>
+    </div>
+
+    <div class="callout callout-blue">
+      <strong>Windows vs Linux — Exam Comparison</strong>
+      Windows: commercial, GUI-first, widely used, proprietary. Linux: open-source, CLI-first, server-focused, free, highly stable. macOS: Unix-based, Apple-exclusive, GUI, used in creative fields.
+    </div>
+  </section>
+
+  <!-- SECTION 4: SYSTEM VS APP -->
+  <section id="sys-vs-app" class="lesson-section">
+    <p class="section-label">Section 04</p>
+    <h2 class="section-heading">System Software vs Application Software</h2>
+
+    <div class="callout callout-orange">
+      <strong>⚠️ Exam Alert — 2025 Q1c, 2024, CIT3100</strong>
+      "Define Operating System and Application Software" — asked almost every year.
+    </div>
+
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>System Software</th>
+          <th>Application Software</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Purpose</td>
+          <td>Manages hardware and provides platform for apps</td>
+          <td>Performs specific tasks for the user</td>
+        </tr>
+        <tr>
+          <td>Examples</td>
+          <td>Windows, Linux, device drivers, BIOS</td>
+          <td>Microsoft Word, Chrome, WhatsApp, VLC</td>
+        </tr>
+        <tr>
+          <td>Who uses it?</td>
+          <td>Runs in the background — users rarely interact directly</td>
+          <td>Users interact with it directly</td>
+        </tr>
+        <tr>
+          <td>Dependency</td>
+          <td>Runs directly on hardware</td>
+          <td>Cannot run without system software</td>
+        </tr>
+        <tr>
+          <td>Loaded</td>
+          <td>At boot time (startup)</td>
+          <td>When the user launches it</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- SECTION 5: CLI vs GUI -->
+  <section id="cli-vs-gui" class="lesson-section">
+    <p class="section-label">Section 05</p>
+    <h2 class="section-heading">CLI vs GUI</h2>
+
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>CLI (Command-Line Interface)</th>
+          <th>GUI (Graphical User Interface)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Interaction</td>
+          <td>User types text commands</td>
+          <td>User clicks icons, menus, windows</td>
+        </tr>
+        <tr>
+          <td>Example</td>
+          <td>Linux Terminal, Windows CMD</td>
+          <td>Windows Desktop, macOS, Android</td>
+        </tr>
+        <tr>
+          <td>Speed</td>
+          <td>Faster for experts</td>
+          <td>Easier for beginners</td>
+        </tr>
+        <tr>
+          <td>Resources</td>
+          <td>Uses very little RAM/CPU</td>
+          <td>Needs more processing power</td>
+        </tr>
+        <tr>
+          <td>Used in</td>
+          <td>Servers, programming, system admin</td>
+          <td>Personal computers, phones</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-green">
+      <strong>GUI Components — Know These (Course Outline 4.5 & 4.6)</strong>
+      Title bar, Menu bar, Status bar, Taskbar, Dialog boxes, Radio buttons, Check boxes, Text boxes, List boxes, Command buttons (OK/Cancel), Desktop shortcuts, Icons.
+    </div>
+  </section>
+
+  <!-- SECTION 6: FILE MANAGEMENT -->
+  <section id="file-management" class="lesson-section">
+    <p class="section-label">Section 06</p>
+    <h2 class="section-heading">File Management &amp; File System</h2>
+
+    <div class="callout callout-orange">
+      <strong>⚠️ Exam Alert — 2025 Q4b, Q4c</strong>
+      "Describe the structure of a file system including directories and paths" + "Explain the significance of file attributes."
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-card-icon">📁</div>
+        <div class="info-card-title">File</div>
+        <div class="info-card-text">A named collection of related data stored on a storage device. Has a name, extension, and metadata (size, date, permissions).</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🗂️</div>
+        <div class="info-card-title">Directory (Folder)</div>
+        <div class="info-card-text">A container that organises files and other directories. Forms the tree structure of the file system.</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🗺️</div>
+        <div class="info-card-title">Path</div>
+        <div class="info-card-text">The location of a file/folder. Absolute path starts from root (C:\Users\Nicholas\). Relative path starts from current location.</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🔑</div>
+        <div class="info-card-title">File Extension</div>
+        <div class="info-card-text">Tells the OS what type of file it is. .docx = Word document, .mp3 = audio, .html = webpage, .exe = executable program.</div>
+      </div>
+    </div>
+
+    <h3 style="font-family:var(--font-head);color:var(--text);font-size:1.2rem;margin:1.5rem 0 0.8rem">File Attributes</h3>
+    <table class="compare-table">
+      <thead>
+        <tr><th>Attribute</th><th>Meaning</th><th>Example Use</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Read-only (R)</td><td>File can be read but not modified</td><td>System configuration files</td></tr>
+        <tr><td>Hidden (H)</td><td>File is not visible in normal directory listing</td><td>OS system files</td></tr>
+        <tr><td>System (S)</td><td>File is part of the operating system</td><td>boot files, kernel files</td></tr>
+        <tr><td>Archive (A)</td><td>File has been modified since last backup</td><td>Backup software uses this</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-family:var(--font-head);color:var(--text);font-size:1.2rem;margin:1.5rem 0 0.8rem">File Operations</h3>
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-card-icon">📋</div>
+        <div class="info-card-title">Copy vs Move</div>
+        <div class="info-card-text"><strong>Copy</strong> — creates a duplicate; original stays. <strong>Move</strong> — transfers to new location; original is removed.</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🗑️</div>
+        <div class="info-card-title">Delete & Recovery</div>
+        <div class="info-card-text">Deleted files go to Recycle Bin (Windows) / Trash (Mac). Permanently deleted only when bin is emptied. Recovery is then very difficult.</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🔐</div>
+        <div class="info-card-title">File Permissions</div>
+        <div class="info-card-text">Read, Write, Execute, Delete — the OS controls who can do what to a file based on user accounts and groups.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAST PAPERS -->
+  <section id="past-papers" class="lesson-section">
+    <p class="section-label">Section 07</p>
+    <h2 class="section-heading">Past Paper Questions &amp; Model Answers</h2>
+
+    <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1.5rem;">Click each question to reveal the model answer. Try to answer in your head first — no peeking 👀</p>
+
+    <div class="past-paper-card">
+      <div class="pp-header" onclick="togglePP(this)">
+        <span class="pp-year">2025 Final</span>
+        <span class="pp-q">Explain the main functions of an operating system.</span>
+        <span class="pp-marks">8 marks</span>
+      </div>
+      <div class="pp-body">
+        <p>An operating system performs five core functions:</p>
+        <div class="model-answer">
+          <strong>Model Answer (8 marks)</strong>
+          <ul>
+            <li><strong>Process Management</strong> — The OS schedules and manages CPU time for all running programs, handling multitasking through time-slicing.</li>
+            <li><strong>Memory Management</strong> — Allocates and deallocates RAM to processes; uses virtual memory when RAM is insufficient.</li>
+            <li><strong>File System Management</strong> — Organises data into files and directories; manages file creation, access, modification, and deletion.</li>
+            <li><strong>Device Management</strong> — Communicates with hardware via device drivers; controls I/O operations and interrupts.</li>
+            <li><strong>Security & User Management</strong> — Controls user access through authentication and permissions; protects system resources from unauthorised access.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="past-paper-card">
+      <div class="pp-header" onclick="togglePP(this)">
+        <span class="pp-year">2025 Final</span>
+        <span class="pp-q">Describe the structure of a file system, including directories and paths.</span>
+        <span class="pp-marks">8 marks</span>
+      </div>
+      <div class="pp-body">
+        <div class="model-answer">
+          <strong>Model Answer</strong>
+          <ul>
+            <li>A <strong>file system</strong> is the method an OS uses to organise and store data on a storage device.</li>
+            <li>It uses a <strong>hierarchical tree structure</strong>: root directory → subdirectories → files.</li>
+            <li>A <strong>directory (folder)</strong> is a container holding files and other directories.</li>
+            <li>An <strong>absolute path</strong> specifies the full location from root, e.g. C:\Users\Nicholas\Documents\notes.txt</li>
+            <li>A <strong>relative path</strong> specifies location relative to the current directory, e.g. Documents\notes.txt</li>
+            <li>Files have <strong>metadata</strong>: name, extension, size, date created/modified, permissions.</li>
+            <li>Common file systems: NTFS (Windows), ext4 (Linux), FAT32 (USB drives).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="past-paper-card">
+      <div class="pp-header" onclick="togglePP(this)">
+        <span class="pp-year">2025 Final</span>
+        <span class="pp-q">Explain the significance of file attributes: Read-only, Hidden, System, Archive.</span>
+        <span class="pp-marks">Part of Q4c</span>
+      </div>
+      <div class="pp-body">
+        <div class="model-answer">
+          <strong>Model Answer</strong>
+          <ul>
+            <li><strong>Read-only</strong> — Prevents accidental modification; used for files that should not be changed, like configuration files.</li>
+            <li><strong>Hidden</strong> — File is not displayed in normal directory view; protects sensitive system files from accidental deletion.</li>
+            <li><strong>System</strong> — Marks files critical to OS operation; prevents deletion or modification by regular users.</li>
+            <li><strong>Archive</strong> — Indicates file has been modified since last backup; used by backup software to identify files that need backing up.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="past-paper-card">
+      <div class="pp-header" onclick="togglePP(this)">
+        <span class="pp-year">2015 Final</span>
+        <span class="pp-q">State 5 services provided by the Operating System, giving a brief explanation of how the OS provides each service.</span>
+        <span class="pp-marks">10 marks</span>
+      </div>
+      <div class="pp-body">
+        <div class="model-answer">
+          <strong>Model Answer (2 marks each)</strong>
+          <ul>
+            <li><strong>Program execution</strong> — OS loads programs into memory and runs them, managing their lifecycle from start to finish.</li>
+            <li><strong>I/O operations</strong> — OS provides a standard way for programs to use I/O devices without needing device-specific code.</li>
+            <li><strong>File system manipulation</strong> — OS provides system calls to create, read, write, delete, and navigate files and directories.</li>
+            <li><strong>Communication</strong> — OS enables processes to communicate via shared memory or message passing.</li>
+            <li><strong>Error detection</strong> — OS constantly monitors for errors in CPU, memory, I/O devices, and user programs, taking corrective action.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="past-paper-card">
+      <div class="pp-header" onclick="togglePP(this)">
+        <span class="pp-year">2025 Q1c–e</span>
+        <span class="pp-q">Define: Operating System, Application Software. State 3 OS functions. Explain file extensions.</span>
+        <span class="pp-marks">10 marks</span>
+      </div>
+      <div class="pp-body">
+        <div class="model-answer">
+          <strong>Model Answer</strong>
+          <ul>
+            <li><strong>Operating System</strong> — System software that manages computer hardware and software resources, providing a platform for application programs to run.</li>
+            <li><strong>Application Software</strong> — Programs designed to help the user perform specific tasks, such as word processing, browsing, or playing games. Examples: MS Word, Chrome, VLC.</li>
+            <li><strong>3 OS Functions</strong> — Process management, memory management, file system management (or any 3 from the 5).</li>
+            <li><strong>File Extension</strong> — A suffix added after a filename (after the dot) that identifies the file type and tells the OS which program should open it. Example: .docx = Word, .pdf = PDF reader, .mp3 = audio player.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="lesson-section">
+    <p class="section-label">Section 08</p>
+    <h2 class="section-heading">Quiz — Test Yourself</h2>
+    <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:1.5rem;">All questions based on past paper style. No multiple choice in exams, but this tests if you actually understood the concepts.</p>
+
+    <div class="quiz-container">
+      <div class="quiz-header">
+        <div>
+          <h3>Operating Systems Quiz</h3>
+          <p class="quiz-meta">10 questions · Exam-style</p>
+        </div>
+        <span class="quiz-progress-text" id="quiz-progress">Q 1 / 10</span>
+      </div>
+
+      <div class="quiz-body">
+
+        <!-- Q1 -->
+        <div class="question-block active" data-q="0">
+          <span class="question-source">2025 Final Exam · Q1c</span>
+          <p class="question-text">Which of the following BEST describes an Operating System?</p>
+          <ul class="options-list">
+            <li><button class="option-btn" onclick="answer(this, false, 'Not quite. MS Word is application software — it helps you do a task, but it doesn\'t manage hardware.')"><span class="option-letter">A</span> A program like MS Word that helps users type documents</button></li>
+            <li><button class="option-btn" onclick="answer(this, true, 'Correct! The OS acts as the intermediary between hardware and software. It manages resources and provides a platform for apps to run.')"><span class="option-letter">B</span> System software that manages hardware and provides a platform for application programs</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'Nope. That\'s a compiler — a different type of system software that translates code.')"><span class="option-letter">C</span> Software that translates programming code into machine language</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'No. A web browser is application software, not an OS.')"><span class="option-letter">D</span> A program used to browse the internet</button></li>
+          </ul>
+          <div class="feedback-box" id="fb-0"></div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="question-block" data-q="1">
+          <span class="question-source">2025 Final Exam · Q4a (8 marks)</span>
+          <p class="question-text">Which of the following is NOT one of the main functions of an Operating System?</p>
+          <ul class="options-list">
+            <li><button class="option-btn" onclick="answer(this, false, 'Process management IS a core function. The OS schedules CPU time for running programs.')"><span class="option-letter">A</span> Process Management</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'Memory management IS a core function. The OS allocates/deallocates RAM.')"><span class="option-letter">B</span> Memory Management</button></li>
+            <li><button class="option-btn" onclick="answer(this, true, 'Correct! Compiling source code is done by a compiler, which is a separate piece of software, not the OS itself.')"><span class="option-letter">C</span> Compiling source code into machine language</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'Device management IS a core function. The OS uses drivers to communicate with hardware.')"><span class="option-letter">D</span> Device Management</button></li>
+          </ul>
+          <div class="feedback-box" id="fb-1"></div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="question-block" data-q="2">
+          <span class="question-source">2025 Final Exam · Q1c</span>
+          <p class="question-text">What is the key difference between System Software and Application Software?</p>
+          <ul class="options-list">
+            <li><button class="option-btn" onclick="answer(this, false, 'Wrong. Application software doesn\'t have to be expensive — many apps are free.')"><span class="option-letter">A</span> System software is free, application software is always paid</button></li>
+            <li><button class="option-btn" onclick="answer(this, true, 'Correct! System software manages hardware resources and provides a platform; application software uses that platform to do specific user tasks.')"><span class="option-letter">B</span> System software manages hardware; application software performs specific user tasks</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'Both can come with the computer — Windows comes pre-installed, and so does Calculator.')"><span class="option-letter">C</span> System software comes with the computer; application software must always be installed</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'That\'s backwards. Application software is what users interact with directly.')"><span class="option-letter">D</span> Application software runs in the background without user interaction</button></li>
+          </ul>
+          <div class="feedback-box" id="fb-2"></div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="question-block" data-q="3">
+          <span class="question-source">Course Outline 4.4</span>
+          <p class="question-text">A user is configuring a server remotely by typing commands like "ls -la" and "mkdir backup". Which type of interface are they using?</p>
+          <ul class="options-list">
+            <li><button class="option-btn" onclick="answer(this, false, 'GUI uses icons and windows — you click, not type.')"><span class="option-letter">A</span> Graphical User Interface (GUI)</button></li>
+            <li><button class="option-btn" onclick="answer(this, true, 'Correct! CLI (Command-Line Interface) requires users to type text commands. It\'s faster for experts and uses fewer resources.')"><span class="option-letter">B</span> Command-Line Interface (CLI)</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'Touch interface uses finger/stylus taps — not text commands.')"><span class="option-letter">C</span> Touch Interface</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'Voice interface uses spoken commands — not typed.')"><span class="option-letter">D</span> Voice Interface</button></li>
+          </ul>
+          <div class="feedback-box" id="fb-3"></div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="question-block" data-q="4">
+          <span class="question-source">2025 Final Exam · Q4c</span>
+          <p class="question-text">A file on a Windows system has the "Hidden" attribute set. What does this mean?</p>
+          <ul class="options-list">
+            <li><button class="option-btn" onclick="answer(this, false, 'Read-only means it can\'t be modified, not that it\'s hidden from view.')"><span class="option-letter">A</span> The file cannot be modified</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'The hidden attribute doesn\'t encrypt anything — the file\'s content is unchanged.')"><span class="option-letter">B</span> The file content is encrypted</button></li>
+            <li><button class="option-btn" onclick="answer(this, true, 'Correct! Hidden files are not displayed in normal directory listings. This protects sensitive OS files from accidental deletion by users.')"><span class="option-letter">C</span> The file is not displayed in normal directory listings</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'The hidden attribute doesn\'t delete the file — it just hides it from view.')"><span class="option-letter">D</span> The file has been deleted</button></li>
+          </ul>
+          <div class="feedback-box" id="fb-4"></div>
+        </div>
+
+        <!-- Q6 -->
+        <div class="question-block" data-q="5">
+          <span class="question-source">Dec 2015 Sample · Q5</span>
+          <p class="question-text">You delete a file on Windows and empty the Recycle Bin. What happens?</p>
+          <ul class="options-list">
+            <li><button class="option-btn" onclick="answer(this, false, 'That\'s what happens when you delete but BEFORE emptying the bin.')"><span class="option-letter">A</span> The file moves to the Recycle Bin and can be recovered</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'Files are not compressed — they go to the Recycle Bin first.')"><span class="option-letter">B</span> The file is compressed and stored elsewhere</button></li>
+            <li><button class="option-btn" onclick="answer(this, true, 'Correct! Once the Recycle Bin is emptied, the file reference is removed from the file system. Recovery is very difficult without specialist software.')"><span class="option-letter">C</span> The file is permanently removed and very difficult to recover</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'Backup is a separate operation — deleting doesn\'t trigger a backup.')"><span class="option-letter">D</span> The file is automatically backed up before deletion</button></li>
+          </ul>
+          <div class="feedback-box" id="fb-5"></div>
+        </div>
+
+        <!-- Q7 -->
+        <div class="question-block" data-q="6">
+          <span class="question-source">2024 Final Exam · Q5</span>
+          <p class="question-text">Which OS is open-source, highly stable, and most commonly used in server environments?</p>
+          <ul class="options-list">
+            <li><button class="option-btn" onclick="answer(this, false, 'Windows is proprietary (paid), not open-source. Also mostly used on desktops.')"><span class="option-letter">A</span> Windows</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'macOS is Apple-only, proprietary, not open-source.')"><span class="option-letter">B</span> macOS</button></li>
+            <li><button class="option-btn" onclick="answer(this, true, 'Correct! Linux is open-source, free, extremely stable, and dominates the server market. Most web servers in the world run Linux.')"><span class="option-letter">C</span> Linux</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'Android is Linux-based but it\'s a mobile OS, not a server OS.')"><span class="option-letter">D</span> Android</button></li>
+          </ul>
+          <div class="feedback-box" id="fb-6"></div>
+        </div>
+
+        <!-- Q8 -->
+        <div class="question-block" data-q="7">
+          <span class="question-source">2025 Final Exam · Q1e</span>
+          <p class="question-text">What is the purpose of a file extension? Give an example.</p>
+          <ul class="options-list">
+            <li><button class="option-btn" onclick="answer(this, false, 'Extensions don\'t store file size — that\'s in the file\'s metadata.')"><span class="option-letter">A</span> To store the file's size in bytes</button></li>
+            <li><button class="option-btn" onclick="answer(this, true, 'Correct! File extensions identify the file type and tell the OS which application should open it. E.g. .docx opens in Word, .mp3 opens in a media player.')"><span class="option-letter">B</span> To identify the file type and determine which program should open it</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'The extension is part of the filename but it doesn\'t make the file unique — that\'s what the full path does.')"><span class="option-letter">C</span> To make each filename unique on the computer</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'Extensions don\'t encrypt files — encryption is a separate security feature.')"><span class="option-letter">D</span> To encrypt the file contents</button></li>
+          </ul>
+          <div class="feedback-box" id="fb-7"></div>
+        </div>
+
+        <!-- Q9 -->
+        <div class="question-block" data-q="8">
+          <span class="question-source">Course Outline 4.8</span>
+          <p class="question-text">What is the difference between COPYING and MOVING a file?</p>
+          <ul class="options-list">
+            <li><button class="option-btn" onclick="answer(this, false, 'That\'s backwards — copy keeps the original, move removes it.')"><span class="option-letter">A</span> Copy removes the original; Move keeps the original</button></li>
+            <li><button class="option-btn" onclick="answer(this, true, 'Correct! Copy creates a duplicate — original stays. Move transfers the file — original no longer exists at the source location.')"><span class="option-letter">B</span> Copy creates a duplicate while keeping the original; Move transfers the file and removes the original</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'Copy and Move are always different operations with different outcomes.')"><span class="option-letter">C</span> Copy and Move do the same thing</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'Copy doesn\'t compress files — that\'s what ZIP/compression tools do.')"><span class="option-letter">D</span> Copy compresses the file; Move leaves it uncompressed</button></li>
+          </ul>
+          <div class="feedback-box" id="fb-8"></div>
+        </div>
+
+        <!-- Q10 -->
+        <div class="question-block" data-q="9">
+          <span class="question-source">2025 Final Exam · Q4c</span>
+          <p class="question-text">The "Archive" file attribute is most useful for which purpose?</p>
+          <ul class="options-list">
+            <li><button class="option-btn" onclick="answer(this, false, 'Archive doesn\'t compress files — use ZIP or other tools for that.')"><span class="option-letter">A</span> Compressing old files to save disk space</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'That\'s what the Hidden attribute does, not Archive.')"><span class="option-letter">B</span> Hiding files from normal directory listings</button></li>
+            <li><button class="option-btn" onclick="answer(this, true, 'Correct! The Archive bit is set whenever a file is modified. Backup software checks this bit to know which files have changed since the last backup and need to be backed up again.')"><span class="option-letter">C</span> Identifying files that have been modified since the last backup</button></li>
+            <li><button class="option-btn" onclick="answer(this, false, 'Preventing modification is what Read-only does.')"><span class="option-letter">D</span> Preventing files from being accidentally modified</button></li>
+          </ul>
+          <div class="feedback-box" id="fb-9"></div>
+        </div>
+
+        <!-- Score Screen -->
+        <div class="score-screen" id="score-screen">
+          <div class="score-circle">
+            <span class="score-number" id="score-num">0</span>
+            <span class="score-total">/ 10</span>
+          </div>
+          <p class="score-message" id="score-msg"></p>
+          <p class="score-sub" id="score-sub"></p>
+          <button class="btn btn-primary" onclick="restartQuiz()">Retry Quiz</button>
+        </div>
+
+        <!-- Navigation -->
+        <div class="quiz-nav" id="quiz-nav">
+          <button class="btn btn-ghost" id="btn-prev" onclick="prevQ()" disabled>← Previous</button>
+          <button class="btn btn-primary" id="btn-next" onclick="nextQ()" disabled>Next →</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer style="border-top:1px solid var(--border);padding-top:1.5rem;margin-top:2rem;display:flex;justify-content:space-between;color:var(--text-muted);font-size:0.82rem;">
+    <span>CSC 2101 · Topic 5 — Operating Systems</span>
+    <a href="CSC2101_index.html" style="color:var(--accent);text-decoration:none;">← Back to Home</a>
+  </footer>
+
+</main>
+
+<script>
+// ── ACCORDION ──
+function toggleAccordion(btn) {
+  const body = btn.nextElementSibling;
+  const isOpen = btn.classList.contains('open');
+  document.querySelectorAll('.accordion-header').forEach(h => {
+    h.classList.remove('open');
+    h.nextElementSibling.classList.remove('open');
+  });
+  if (!isOpen) {
+    btn.classList.add('open');
+    body.classList.add('open');
+  }
+}
+
+// ── PAST PAPERS ──
+function togglePP(header) {
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+// ── QUIZ ──
+let currentQ = 0;
+let score = 0;
+let answered = new Array(10).fill(false);
+const totalQ = 10;
+
+function answer(btn, isCorrect, explanation) {
+  if (answered[currentQ]) return;
+  answered[currentQ] = true;
+
+  const block = btn.closest('.question-block');
+  const allBtns = block.querySelectorAll('.option-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('fb-' + currentQ);
+  fb.classList.add('show');
+
+  if (isCorrect) {
+    btn.classList.add('correct');
+    score++;
+    fb.classList.add('feedback-correct');
+    fb.innerHTML = '<strong>✓ Correct!</strong>' + explanation;
+  } else {
+    btn.classList.add('wrong');
+    fb.classList.add('feedback-wrong');
+    fb.innerHTML = '<strong>✗ Not quite.</strong>' + explanation;
+    // highlight correct
+    allBtns.forEach(b => {
+      if (b.getAttribute('onclick') && b.getAttribute('onclick').includes('true')) {
+        b.classList.add('correct');
+      }
+    });
+  }
+
+  document.getElementById('btn-next').disabled = false;
+  updateProgress();
+}
+
+function nextQ() {
+  if (currentQ < totalQ - 1) {
+    document.querySelectorAll('.question-block')[currentQ].classList.remove('active');
+    currentQ++;
+    document.querySelectorAll('.question-block')[currentQ].classList.add('active');
+    document.getElementById('btn-prev').disabled = false;
+    document.getElementById('btn-next').disabled = !answered[currentQ];
+    updateProgress();
+  } else {
+    showScore();
+  }
+}
+
+function prevQ() {
+  if (currentQ > 0) {
+    document.querySelectorAll('.question-block')[currentQ].classList.remove('active');
+    currentQ--;
+    document.querySelectorAll('.question-block')[currentQ].classList.add('active');
+    document.getElementById('btn-prev').disabled = currentQ === 0;
+    document.getElementById('btn-next').disabled = !answered[currentQ];
+    updateProgress();
+  }
+}
+
+function updateProgress() {
+  const pct = Math.round((answered.filter(Boolean).length / totalQ) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('quiz-progress').textContent = 'Q ' + (currentQ + 1) + ' / ' + totalQ;
+
+  const isLast = currentQ === totalQ - 1;
+  const nextBtn = document.getElementById('btn-next');
+  if (isLast && answered[currentQ]) {
+    nextBtn.textContent = 'See Results →';
+  } else {
+    nextBtn.textContent = 'Next →';
+  }
+}
+
+function showScore() {
+  document.querySelectorAll('.question-block').forEach(b => b.classList.remove('active'));
+  document.getElementById('quiz-nav').style.display = 'none';
+  const ss = document.getElementById('score-screen');
+  ss.classList.add('show');
+  document.getElementById('score-num').textContent = score;
+
+  const pct = (score / totalQ) * 100;
+  let msg, sub;
+  if (pct >= 80) {
+    msg = '🔥 Excellent! You know your OS!';
+    sub = 'You\'re ready for this topic in the exam. Move to the next one.';
+  } else if (pct >= 60) {
+    msg = '👍 Good — but a few gaps.';
+    sub = 'Re-read the sections you got wrong, then quiz yourself again.';
+  } else {
+    msg = '📚 Keep studying — you\'ll get there.';
+    sub = 'Go back through each section slowly. The answers are all there.';
+  }
+  document.getElementById('score-msg').textContent = msg;
+  document.getElementById('score-sub').textContent = sub;
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('progress-pct').textContent = '100%';
+}
+
+function restartQuiz() {
+  currentQ = 0; score = 0;
+  answered = new Array(10).fill(false);
+  document.querySelectorAll('.question-block').forEach((b, i) => {
+    b.classList.toggle('active', i === 0);
+    b.querySelectorAll('.option-btn').forEach(btn => {
+      btn.disabled = false;
+      btn.classList.remove('correct', 'wrong');
+    });
+    const fb = document.getElementById('fb-' + i);
+    if (fb) { fb.classList.remove('show', 'feedback-correct', 'feedback-wrong'); fb.innerHTML = ''; }
+  });
+  document.getElementById('score-screen').classList.remove('show');
+  document.getElementById('quiz-nav').style.display = 'flex';
+  document.getElementById('btn-prev').disabled = true;
+  document.getElementById('btn-next').disabled = true;
+  document.getElementById('btn-next').textContent = 'Next →';
+  document.getElementById('progress-fill').style.width = '0%';
+  document.getElementById('progress-pct').textContent = '0%';
+  document.getElementById('quiz-progress').textContent = 'Q 1 / 10';
+}
+
+// ── HAMBURGER ──
+document.getElementById('hamburger').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+});
+
+// ── SMOOTH SCROLL ──
+document.querySelectorAll('.nav-link-item').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+    if (window.innerWidth <= 900) document.getElementById('sidebar').classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>
