@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EliteHub — Study Smarter Together</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  [data-theme="dark"] {
+    --bg:         #080810;
+    --bg2:        #0e0e1a;
+    --surface:    #13131f;
+    --surface2:   #1a1a2e;
+    --border:     rgba(255,255,255,0.07);
+    --text:       #e8e6f0;
+    --text-dim:   #7878a0;
+    --accent:     #c8f53a;
+    --accent-dim: rgba(200,245,58,0.12);
+    --accent-glow:rgba(200,245,58,0.25);
+    --card-hover: #1e1e30;
+    --success:    #4ade80;
+    --warning:    #fbbf24;
+    --danger:     #f87171;
+    --logo-color: #c8f53a;
+    --toggle-bg:  #1a1a2e;
+    --tag-bg:     rgba(200,245,58,0.1);
+    --tag-text:   #c8f53a;
+  }
+  
+  [data-theme="light"] {
+    --bg:         #f4f2eb;
+    --bg2:        #ede9e0;
+    --surface:    #ffffff;
+    --surface2:   #f0ece3;
+    --border:     rgba(0,0,0,0.08);
+    --text:       #1a1a2e;
+    --text-dim:   #6b6b8a;
+    --accent:     #1d4ed8;
+    --accent-dim: rgba(29,78,216,0.08);
+    --accent-glow:rgba(29,78,216,0.15);
+    --card-hover: #e8e4db;
+    --success:    #22c55e;
+    --warning:    #f59e0b;
+    --danger:     #ef4444;
+    --logo-color: #1d4ed8;
+    --toggle-bg:  #e2ddd4;
+    --tag-bg:     rgba(29,78,216,0.08);
+    --tag-text:   #1d4ed8;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    transition: background var(--transition), color var(--transition);
+  }
+
+  /* ─── LAYOUT ─── */
+  .app-container {
+    display: grid;
+    grid-template-columns: 280px 1fr 300px;
+    min-height: 100vh;
+    padding-top: 60px;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 clamp(1.5rem, 5vw, 4rem);
+    height: 60px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.7rem;
+    letter-spacing: 0.08em;
+    color: var(--logo-color);
+    text-decoration: none;
+  }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .theme-toggle {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    transition: all var(--transition);
+  }
+
+  .theme-toggle:hover {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem;
+    overflow-y: auto;
+    height: calc(100vh - 60px);
+    position: sticky;
+    top: 60px;
+  }
+
+  .sidebar-section {
+    margin-bottom: 2rem;
+  }
+
+  .sidebar-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+
+  .course-list {
+    list-style: none;
+  }
+
+  .course-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all var(--transition);
+    margin-bottom: 0.5rem;
+  }
+
+  .course-item:hover {
+    background: var(--surface2);
+  }
+
+  .course-item.active {
+    background: var(--accent-dim);
+    border-left: 3px solid var(--accent);
+  }
+
+  .course-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--accent-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 0.7rem;
+    color: var(--accent);
+  }
+
+  .course-info {
+    flex: 1;
+  }
+
+  .course-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .course-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+  }
+
+  .unread-badge {
+    background: var(--accent);
+    color: var(--bg);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+  }
+
+  /* ─── MAIN CONTENT ─── */
+  .main-content {
+    padding: 2rem;
+    overflow-y: auto;
+    height: calc(100vh - 60px);
+  }
+
+  .course-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .course-title h1 {
+    font-size: 1.8rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .course-title p {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+
+  .exam-countdown {
+    background: linear-gradient(135deg, var(--accent-dim), var(--surface2));
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    text-align: center;
+  }
+
+  .countdown-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+  }
+
+  .countdown-timer {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .countdown-unit {
+    text-align: center;
+  }
+
+  .countdown-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .countdown-label-small {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  /* ─── TABS ─── */
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+  }
+
+  .tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    border-radius: 8px 8px 0 0;
+    transition: all var(--transition);
+    position: relative;
+  }
+
+  .tab-btn:hover {
+    color: var(--text);
+    background: var(--surface2);
+  }
+
+  .tab-btn.active {
+    color: var(--accent);
+  }
+
+  .tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -0.5rem;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  /* ─── PINNED RESOURCES ─── */
+  .pinned-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+  }
+
+  .pinned-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .resource-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .resource-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    box-shadow: 0 4px 20px var(--accent-glow);
+  }
+
+  .resource-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .resource-name {
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .resource-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+  }
+
+  /* ─── DISCUSSION THREADS ─── */
+  .thread-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .thread-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all var(--transition);
+  }
+
+  .thread-card:hover {
+    border-color: var(--border);
+    background: var(--surface2);
+  }
+
+  .thread-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+  }
+
+  .thread-title {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .thread-preview {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .thread-meta {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+  }
+
+  .thread-stats {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .answered-badge {
+    background: var(--success);
+    color: var(--bg);
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  /* ─── NEW POST BUTTON ─── */
+  .new-post-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px var(--accent-glow);
+    transition: all var(--transition);
+    z-index: 100;
+  }
+
+  .new-post-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 30px var(--accent-glow);
+  }
+
+  /* ─── RIGHT PANEL ─── */
+  .right-panel {
+    background: var(--bg2);
+    border-left: 1px solid var(--border);
+    padding: 1.5rem;
+    overflow-y: auto;
+    height: calc(100vh - 60px);
+    position: sticky;
+    top: 60px;
+  }
+
+  .notification-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all var(--transition);
+  }
+
+  .notification-card:hover {
+    border-color: var(--accent);
+  }
+
+  .notification-card.new {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+  }
+
+  .notification-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    margin-bottom: 0.3rem;
+  }
+
+  .notification-text {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .notification-action {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    cursor: pointer;
+  }
+
+  /* ─── FLASHCARD PREVIEW ─── */
+  .flashcard-section {
+    margin-top: 2rem;
+  }
+
+  .flashcard {
+    background: linear-gradient(135deg, var(--surface), var(--surface2));
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition);
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .flashcard:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .flashcard-front {
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .flashcard-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-top: 1rem;
+  }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.active {
+    display: flex;
+  }
+
+  .modal {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .modal-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  .modal-close {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color var(--transition);
+  }
+
+  .modal-close:hover {
+    color: var(--text);
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+  }
+
+  .form-input, .form-textarea, .form-select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem;
+    color: var(--text);
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.95rem;
+    transition: all var(--transition);
+  }
+
+  .form-input:focus, .form-textarea:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+  }
+
+  .form-textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .btn {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--accent);
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+  }
+
+  /* ─── FILE UPLOAD ─── */
+  .file-drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all var(--transition);
+    cursor: pointer;
+  }
+
+  .file-drop-zone:hover, .file-drop-zone.dragover {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  .file-drop-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .file-drop-text {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1200px) {
+    .app-container {
+      grid-template-columns: 240px 1fr;
+    }
+    .right-panel {
+      display: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .app-container {
+      grid-template-columns: 1fr;
+    }
+    .sidebar {
+      display: none;
+    }
+    .main-content {
+      padding: 1rem;
+    }
+  }
+</style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav>
+    <a href="#" class="nav-logo">EliteHub</a>
+    <div class="nav-actions">
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <span id="theme-icon">🌙</span>
+        <span id="theme-text">Dark</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main App Container -->
+  <div class="app-container">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Your Courses</div>
+        <ul class="course-list">
+          <li class="course-item active" onclick="selectCourse('csc2111')">
+            <div class="course-icon">CS</div>
+            <div class="course-info">
+              <div class="course-name">Data Structures</div>
+              <div class="course-code">CSC 2111</div>
+            </div>
+            <span class="unread-badge">3</span>
+          </li>
+          <li class="course-item" onclick="selectCourse('csc2101')">
+            <div class="course-icon">JA</div>
+            <div class="course-info">
+              <div class="course-name">Java Programming</div>
+              <div class="course-code">CSC 2101</div>
+            </div>
+            <span class="unread-badge">1</span>
+          </li>
+          <li class="course-item" onclick="selectCourse('mat2201')">
+            <div class="course-icon">MA</div>
+            <div class="course-info">
+              <div class="course-name">Linear Algebra</div>
+              <div class="course-code">MAT 2201</div>
+            </div>
+          </li>
+          <li class="course-item" onclick="selectCourse('phy1101')">
+            <div class="course-icon">PH</div>
+            <div class="course-info">
+              <div class="course-name">Mechanics</div>
+              <div class="course-code">PHY 1101</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">Quick Access</div>
+        <ul class="course-list">
+          <li class="course-item">
+            <div class="course-icon">📚</div>
+            <div class="course-info">
+              <div class="course-name">All Resources</div>
+            </div>
+          </li>
+          <li class="course-item">
+            <div class="course-icon">❓</div>
+            <div class="course-info">
+              <div class="course-name">Unanswered Q&A</div>
+            </div>
+            <span class="unread-badge">5</span>
+          </li>
+          <li class="course-item">
+            <div class="course-icon">📅</div>
+            <div class="course-info">
+              <div class="course-name">Exam Schedule</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Course Header with Exam Countdown -->
+      <div class="course-header">
+        <div class="course-title">
+          <h1>Data Structures</h1>
+          <p>CSC 2111 • Fall 2025 • Prof. Nicholas Musingi</p>
+        </div>
+        <div class="exam-countdown">
+          <div class="countdown-label">Final Exam In</div>
+          <div class="countdown-timer" id="countdown-timer">
+            <div class="countdown-unit">
+              <div class="countdown-value" id="days">14</div>
+              <div class="countdown-label-small">Days</div>
+            </div>
+            <div class="countdown-unit">
+              <div class="countdown-value" id="hours">08</div>
+              <div class="countdown-label-small">Hours</div>
+            </div>
+            <div class="countdown-unit">
+              <div class="countdown-value" id="minutes">42</div>
+              <div class="countdown-label-small">Mins</div>
+            </div>
+            <div class="countdown-unit">
+              <div class="countdown-value" id="seconds">15</div>
+              <div class="countdown-label-small">Secs</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('discussions')">💬 Discussions</button>
+        <button class="tab-btn" onclick="switchTab('resources')">📎 Resources</button>
+        <button class="tab-btn" onclick="switchTab('qa')">❓ Q&A</button>
+        <button class="tab-btn" onclick="switchTab('flashcards')">🃏 Flashcards</button>
+      </div>
+
+      <!-- Pinned Resources Section -->
+      <div class="pinned-section">
+        <div class="section-header">
+          <div class="section-title">📌 Pinned Resources</div>
+        </div>
+        <div class="pinned-grid">
+          <div class="resource-card">
+            <div class="resource-icon">📄</div>
+            <div class="resource-name">Course Syllabus.pdf</div>
+            <div class="resource-meta">2.4 MB • Updated 2d ago</div>
+          </div>
+          <div class="resource-card">
+            <div class="resource-icon">📊</div>
+            <div class="resource-name">Lecture Slides W1-3.zip</div>
+            <div class="resource-meta">15.8 MB • Updated 5d ago</div>
+          </div>
+          <div class="resource-card">
+            <div class="resource-icon">📝</div>
+            <div class="resource-name">Key Formulas Sheet</div>
+            <div class="resource-meta">Shared by Sarah • 1w ago</div>
+          </div>
+          <div class="resource-card">
+            <div class="resource-icon">🔗</div>
+            <div class="resource-name">Visual Algo Explorer</div>
+            <div class="resource-meta">External Link • visalgo.com</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Discussion Threads -->
+      <div id="discussions-tab">
+        <div class="thread-list">
+          <div class="thread-card">
+            <div class="thread-header">
+              <div>
+                <div class="thread-title">Understanding Big O Notation for Nested Loops</div>
+                <div class="thread-preview">Can someone explain how to calculate time complexity when we have nested loops with different conditions?...</div>
+              </div>
+              <span class="answered-badge">✓ Answered</span>
+            </div>
+            <div class="thread-meta">
+              <span>Posted by Alex K. • 2 hours ago</span>
+              <div class="thread-stats">
+                <span class="stat-item">💬 8 replies</span>
+                <span class="stat-item">👁️ 24 views</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="thread-card">
+            <div class="thread-header">
+              <div>
+                <div class="thread-title">Binary Tree Traversal Practice Problems</div>
+                <div class="thread-preview">I've compiled a list of practice problems for inorder, preorder, and postorder traversals. Check them out!</div>
+              </div>
+            </div>
+            <div class="thread-meta">
+              <span>Posted by Jamie L. • 5 hours ago</span>
+              <div class="thread-stats">
+                <span class="stat-item">💬 12 replies</span>
+                <span class="stat-item">👁️ 47 views</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="thread-card">
+            <div class="thread-header">
+              <div>
+                <div class="thread-title">Hash Table Collision Resolution Methods</div>
+                <div class="thread-preview">What's the difference between chaining and open addressing? When should we use each?</div>
+              </div>
+            </div>
+            <div class="thread-meta">
+              <span>Posted by Morgan T. • 1 day ago</span>
+              <div class="thread-stats">
+                <span class="stat-item">💬 5 replies</span>
+                <span class="stat-item">👁️ 31 views</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="thread-card">
+            <div class="thread-header">
+              <div>
+                <div class="thread-title">Study Group for Midterm?</div>
+                <div class="thread-preview">Anyone interested in forming a study group for the upcoming midterm? Thinking of meeting at the library...</div>
+              </div>
+            </div>
+            <div class="thread-meta">
+              <span>Posted by Chris P. • 2 days ago</span>
+              <div class="thread-stats">
+                <span class="stat-item">💬 15 replies</span>
+                <span class="stat-item">👁️ 62 views</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- New Post Button -->
+      <button class="new-post-btn" onclick="openModal('new-post-modal')">+</button>
+    </main>
+
+    <!-- Right Panel - Notifications & Flashcards -->
+    <aside class="right-panel">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Recent Notifications</div>
+        
+        <div class="notification-card new">
+          <div class="notification-time">5 min ago</div>
+          <div class="notification-text"><strong>Sarah</strong> shared a new note: "Graph Algorithms Summary"</div>
+          <div class="notification-action">View Note →</div>
+        </div>
+
+        <div class="notification-card new">
+          <div class="notification-time">1 hour ago</div>
+          <div class="notification-text"><strong>Prof. Musingi</strong> posted an announcement about the assignment deadline</div>
+          <div class="notification-action">Read Announcement →</div>
+        </div>
+
+        <div class="notification-card">
+          <div class="notification-time">3 hours ago</div>
+          <div class="notification-text">Your question about AVL trees was <strong>answered</strong></div>
+          <div class="notification-action">View Answer →</div>
+        </div>
+
+        <div class="notification-card">
+          <div class="notification-time">Yesterday</div>
+          <div class="notification-text"><strong>Jordan</strong> commented on your thread about sorting algorithms</div>
+          <div class="notification-action">View Comment →</div>
+        </div>
+      </div>
+
+      <!-- Daily Flashcard -->
+      <div class="flashcard-section">
+        <div class="sidebar-title">Daily Flashcard</div>
+        <div class="flashcard" onclick="flipFlashcard(this)">
+          <div class="flashcard-front">
+            What is the time complexity of binary search?
+          </div>
+          <div class="flashcard-hint">Click to reveal answer</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- New Post Modal -->
+  <div class="modal-overlay" id="new-post-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Create New Post</h2>
+        <button class="modal-close" onclick="closeModal('new-post-modal')">&times;</button>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Post Type</label>
+        <select class="form-select" id="post-type">
+          <option value="discussion">💬 Discussion Thread</option>
+          <option value="question">❓ Question (Q&A)</option>
+          <option value="resource">📎 Share Resource</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Title</label>
+        <input type="text" class="form-input" placeholder="What's on your mind?" id="post-title">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Content</label>
+        <textarea class="form-textarea" placeholder="Share your thoughts, ask a question, or describe your resource..." id="post-content"></textarea>
+      </div>
+
+      <div class="form-group" id="file-upload-section" style="display: none;">
+        <label class="form-label">Attach File</label>
+        <div class="file-drop-zone" id="file-drop-zone">
+          <div class="file-drop-icon">📎</div>
+          <div class="file-drop-text">Drag & drop files here or click to browse<br><small>PDF, DOC, ZIP, PNG, JPG up to 25MB</small></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tags (optional)</label>
+        <input type="text" class="form-input" placeholder="e.g., #algorithms #exam-prep" id="post-tags">
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('new-post-modal')">Cancel</button>
+        <button class="btn" onclick="submitPost()">Post</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Thread Detail Modal -->
+  <div class="modal-overlay" id="thread-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Thread Details</h2>
+        <button class="modal-close" onclick="closeModal('thread-modal')">&times;</button>
+      </div>
+      
+      <div class="thread-card" style="margin-bottom: 1.5rem;">
+        <div class="thread-header">
+          <div>
+            <div class="thread-title" id="thread-detail-title">Thread Title</div>
+            <div class="thread-meta">
+              <span id="thread-detail-author">Posted by User • Time ago</span>
+              <span class="answered-badge" id="thread-detail-answered" style="display: none;">✓ Answered</span>
+            </div>
+          </div>
+        </div>
+        <div class="thread-preview" id="thread-detail-content" style="margin-bottom: 1rem;">
+          Thread content goes here...
+        </div>
+      </div>
+
+      <div class="sidebar-title">Replies</div>
+      <div id="thread-replies" style="margin-top: 1rem;">
+        <!-- Replies will be populated dynamically -->
+      </div>
+
+      <div class="form-group" style="margin-top: 1.5rem;">
+        <label class="form-label">Your Reply</label>
+        <textarea class="form-textarea" placeholder="Write your reply..." style="min-height: 80px;"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('thread-modal')">Close</button>
+        <button class="btn">Reply</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Theme Toggle
+  function toggleTheme() {
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', newTheme);
+    
+    document.getElementById('theme-icon').textContent = newTheme === 'dark' ? '🌙' : '☀️';
+    document.getElementById('theme-text').textContent = newTheme === 'dark' ? 'Dark' : 'Light';
+    
+    localStorage.setItem('theme', newTheme);
+  }
+
+  // Load saved theme
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  document.getElementById('theme-icon').textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+  document.getElementById('theme-text').textContent = savedTheme === 'dark' ? 'Dark' : 'Light';
+
+  // Course Selection
+  function selectCourse(courseCode) {
+    document.querySelectorAll('.course-item').forEach(item => {
+      item.classList.remove('active');
+    });
+    event.currentTarget.classList.add('active');
+    // In a real app, this would load course-specific data
+    console.log('Selected course:', courseCode);
+  }
+
+  // Tab Switching
+  function switchTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    event.currentTarget.classList.add('active');
+    console.log('Switched to tab:', tabName);
+  }
+
+  // Countdown Timer
+  function updateCountdown() {
+    // Set exam date (14 days from now for demo)
+    const examDate = new Date();
+    examDate.setDate(examDate.getDate() + 14);
+    examDate.setHours(9, 0, 0, 0); // 9 AM
+    
+    const now = new Date();
+    const diff = examDate - now;
+    
+    if (diff > 0) {
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      
+      document.getElementById('days').textContent = String(days).padStart(2, '0');
+      document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+      document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+      document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+    }
+  }
+
+  setInterval(updateCountdown, 1000);
+  updateCountdown();
+
+  // Modal Functions
+  function openModal(modalId) {
+    document.getElementById(modalId).classList.add('active');
+    
+    // Show/hide file upload based on post type
+    const postTypeSelect = document.getElementById('post-type');
+    if (postTypeSelect) {
+      postTypeSelect.addEventListener('change', function() {
+        const fileSection = document.getElementById('file-upload-section');
+        fileSection.style.display = this.value === 'resource' ? 'block' : 'none';
+      });
+    }
+  }
+
+  function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+  }
+
+  // Close modal on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.classList.remove('active');
+      }
+    });
+  });
+
+  // Submit Post
+  function submitPost() {
+    const postType = document.getElementById('post-type').value;
+    const title = document.getElementById('post-title').value;
+    const content = document.getElementById('post-content').value;
+    
+    if (!title || !content) {
+      alert('Please fill in both title and content');
+      return;
+    }
+    
+    console.log('New post:', { type: postType, title, content });
+    closeModal('new-post-modal');
+    
+    // Clear form
+    document.getElementById('post-title').value = '';
+    document.getElementById('post-content').value = '';
+    
+    // In a real app, this would save to backend and update UI
+    alert('Post created successfully! (Demo mode)');
+  }
+
+  // Flip Flashcard
+  function flipFlashcard(card) {
+    const front = card.querySelector('.flashcard-front');
+    const hint = card.querySelector('.flashcard-hint');
+    
+    if (front.textContent.includes('time complexity')) {
+      front.textContent = 'O(log n) - Binary search halves the search space with each comparison';
+      hint.textContent = 'Click to see question';
+    } else {
+      front.textContent = 'What is the time complexity of binary search?';
+      hint.textContent = 'Click to reveal answer';
+    }
+  }
+
+  // File Drop Zone
+  const dropZone = document.getElementById('file-drop-zone');
+  if (dropZone) {
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+    });
+
+    dropZone.addEventListener('drop', handleDrop, false);
+    dropZone.addEventListener('click', () => {
+      // In a real app, this would trigger file input
+      console.log('File browser opened');
+    });
+  }
+
+  function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    console.log('Files dropped:', files);
+    // Handle file upload
+  }
+
+  // Mark notification as read
+  document.querySelectorAll('.notification-card.new').forEach(card => {
+    card.addEventListener('click', function() {
+      this.classList.remove('new');
+    });
+  });
+
+  // Thread click handler
+  document.querySelectorAll('.thread-card').forEach(card => {
+    card.addEventListener('click', function(e) {
+      if (!e.target.closest('.answered-badge')) {
+        openThreadDetail(this);
+      }
+    });
+  });
+
+  function openThreadDetail(card) {
+    const title = card.querySelector('.thread-title').textContent;
+    const preview = card.querySelector('.thread-preview').textContent;
+    const author = card.querySelector('.thread-meta span').textContent;
+    const isAnswered = card.querySelector('.answered-badge') !== null;
+    
+    document.getElementById('thread-detail-title').textContent = title;
+    document.getElementById('thread-detail-content').textContent = preview;
+    document.getElementById('thread-detail-author').textContent = author;
+    document.getElementById('thread-detail-answered').style.display = isAnswered ? 'inline-block' : 'none';
+    
+    openModal('thread-modal');
+  }
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', function(e) {
+    // ESC to close modals
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay.active').forEach(modal => {
+        modal.classList.remove('active');
+      });
+    }
+    
+    // Ctrl/Cmd + N for new post
+    if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+      e.preventDefault();
+      openModal('new-post-modal');
+    }
+  });
+
+  console.log('EliteHub initialized! 🚀');
+  console.log('Features loaded:');
+  console.log('  ✓ Course-organized channels');
+  console.log('  ✓ Persistent file sharing');
+  console.log('  ✓ Threaded discussions');
+  console.log('  ✓ Pinned resources');
+  console.log('  ✓ Q&A format');
+  console.log('  ✓ Flashcards');
+  console.log('  ✓ Exam countdown');
+  console.log('  ✓ Notifications');
+</script>
+</body>
+</html>
