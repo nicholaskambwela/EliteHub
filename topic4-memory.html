@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memory & Storage — CSC 2101</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Inconsolata:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── DESIGN: Deep teal / warm amber / cream
+   Feels like a technical library — precise, layered, warm.
+   Syne for headers (geometric), DM Sans body, Inconsolata mono.
+   Nothing like OS (dark moss), Numbers (black/yellow),
+   Hardware (navy/orange), or CPU (charcoal/purple).
+──────────────────────────────────────────────────── */
+:root {
+  --bg: #0d1f1a;
+  --s1: #102219;
+  --s2: #142b21;
+  --s3: #1a3429;
+  --s4: #1f3d30;
+  --border: #1e3a2e;
+  --border2: #265040;
+  --text: #d8ede4;
+  --muted: #527a65;
+  --teal: #00b894;
+  --teal2: #00d4a8;
+  --amber: #ffb347;
+  --amber2: #ffd080;
+  --red: #ff6b6b;
+  --blue: #74b9ff;
+  --cream: #f0e8d8;
+  --pink: #fd79a8;
+
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'Inconsolata', monospace;
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+
+body{
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.7;
+  overflow-x:hidden;
+}
+
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse at 10% 80%, rgba(0,184,148,0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 20%, rgba(255,179,71,0.04) 0%, transparent 40%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── NAV ── */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:var(--s1);
+  border-bottom:2px solid var(--teal);
+  padding:0 2rem;height:52px;
+  display:flex;align-items:center;gap:1.5rem;
+}
+.nav-back{
+  font-family:var(--font-mono);font-size:0.72rem;
+  color:var(--teal);text-decoration:none;
+  display:flex;align-items:center;gap:0.4rem;
+  letter-spacing:0.05em;transition:opacity 0.2s;
+}
+.nav-back:hover{opacity:0.6;}
+.nav-path{font-family:var(--font-mono);font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;}
+.nav-links{margin-left:auto;display:flex;gap:0.2rem;list-style:none;}
+.nav-links a{
+  font-family:var(--font-mono);font-size:0.65rem;color:var(--muted);
+  text-decoration:none;padding:0.3rem 0.6rem;border-radius:2px;transition:all 0.15s;
+}
+.nav-links a:hover{background:rgba(0,184,148,0.1);color:var(--teal);}
+
+/* ── HERO ── */
+.hero{
+  background:var(--s1);border-bottom:1px solid var(--border);
+  padding:4.5rem 2rem 3.5rem;position:relative;overflow:hidden;z-index:1;
+}
+.hero::before{
+  content:'';position:absolute;
+  width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,184,148,0.06) 0%,transparent 70%);
+  top:-150px;right:-100px;pointer-events:none;
+}
+.hero::after{
+  content:'RAM';position:absolute;
+  right:2rem;bottom:-1.5rem;
+  font-family:var(--font-head);font-size:14rem;font-weight:800;
+  color:rgba(0,184,148,0.04);line-height:1;pointer-events:none;
+}
+.hero-inner{max-width:860px;margin:0 auto;position:relative;z-index:1;}
+
+.hero-chip{
+  display:inline-flex;align-items:center;gap:0.6rem;
+  font-family:var(--font-mono);font-size:0.68rem;color:var(--teal);
+  letter-spacing:0.15em;text-transform:uppercase;
+  border:1px solid rgba(0,184,148,0.3);background:rgba(0,184,148,0.06);
+  padding:0.35rem 1rem;margin-bottom:1.5rem;
+}
+.hero-chip::before{content:'▸';}
+
+.hero h1{
+  font-family:var(--font-head);font-size:clamp(2.8rem,7vw,5.2rem);
+  font-weight:800;line-height:1.0;letter-spacing:-0.01em;
+  color:white;margin-bottom:1rem;
+}
+.hero h1 .acc{color:var(--teal);}
+
+.hero-desc{font-size:1rem;color:var(--muted);max-width:560px;margin-bottom:2rem;line-height:1.8;}
+
+.hero-tags{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:3rem;}
+.htag{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.07em;text-transform:uppercase;padding:0.3rem 0.8rem;border:1px solid;}
+.ht-t{color:var(--teal);border-color:rgba(0,184,148,0.3);background:rgba(0,184,148,0.06);}
+.ht-a{color:var(--amber);border-color:rgba(255,179,71,0.3);background:rgba(255,179,71,0.05);}
+.ht-r{color:var(--red);border-color:rgba(255,107,107,0.3);background:rgba(255,107,107,0.05);}
+.ht-b{color:var(--blue);border-color:rgba(116,185,255,0.3);background:rgba(116,185,255,0.05);}
+
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--border2);overflow:hidden;}
+.hs{padding:1.2rem;border-right:1px solid var(--border2);text-align:center;background:rgba(255,255,255,0.01);}
+.hs:last-child{border-right:none;}
+.hs-n{font-family:var(--font-head);font-size:2rem;font-weight:800;color:var(--teal);line-height:1;margin-bottom:0.3rem;}
+.hs-l{font-family:var(--font-mono);font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;}
+
+/* ── CONTENT ── */
+.content{max-width:860px;margin:0 auto;padding:0 2rem 6rem;position:relative;z-index:1;}
+
+/* ── SECTION ── */
+.sec{margin-top:5rem;opacity:0;transform:translateY(18px);transition:opacity 0.55s,transform 0.55s;}
+.sec.visible{opacity:1;transform:translateY(0);}
+
+.sec-label{font-family:var(--font-mono);font-size:0.62rem;color:var(--muted);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.4rem;}
+.sec-title{font-family:var(--font-head);font-size:2.2rem;font-weight:800;color:white;margin-bottom:0.3rem;letter-spacing:-0.01em;}
+.sec-title .acc{color:var(--teal);}
+.sec-rule{height:2px;border:none;background:linear-gradient(90deg,var(--teal),transparent);margin-bottom:2rem;}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.1rem 1.4rem;border-left:3px solid;margin:1.5rem 0;font-size:0.88rem;line-height:1.7;}
+.callout strong{font-family:var(--font-mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:0.3rem;}
+.ct{background:rgba(0,184,148,0.07);border-color:var(--teal);color:#90e0c8;}
+.ct strong{color:var(--teal);}
+.ca{background:rgba(255,179,71,0.06);border-color:var(--amber);color:#e8c870;}
+.ca strong{color:var(--amber);}
+.cr{background:rgba(255,107,107,0.06);border-color:var(--red);color:#f0b0b0;}
+.cr strong{color:var(--red);}
+.cb{background:rgba(116,185,255,0.05);border-color:var(--blue);color:#a0c8f0;}
+.cb strong{color:var(--blue);}
+
+/* ── MEMORY HIERARCHY ── */
+.mem-pyramid{
+  display:flex;flex-direction:column;gap:2px;
+  margin:1.5rem 0;
+  align-items:stretch;
+}
+.mem-layer{
+  display:grid;grid-template-columns:1fr 2fr 1fr;
+  align-items:center;gap:1rem;
+  padding:1rem 1.4rem;
+  border:1px solid var(--border2);
+  background:var(--s2);
+  transition:background 0.2s;
+  position:relative;
+  overflow:hidden;
+}
+.mem-layer:hover{background:var(--s3);}
+.mem-layer::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:4px;background:var(--layer-color,var(--teal));
+}
+.mem-layer-name{font-family:var(--font-head);font-size:1.1rem;font-weight:700;letter-spacing:0.02em;}
+.mem-layer-desc{font-size:0.83rem;color:#7aaa90;line-height:1.6;}
+.mem-layer-specs{text-align:right;}
+.mem-spec{font-family:var(--font-mono);font-size:0.72rem;display:block;margin-bottom:0.2rem;}
+.spec-speed{color:var(--teal);}
+.spec-size{color:var(--amber);}
+.spec-cost{color:var(--muted);}
+
+/* ── COMPARE TABLE ── */
+.c-table{width:100%;border-collapse:collapse;font-size:0.87rem;margin:1.5rem 0;border:1px solid var(--border);}
+.c-table thead tr{background:var(--teal);}
+.c-table th{padding:0.8rem 1.2rem;text-align:left;font-family:var(--font-head);font-size:0.85rem;font-weight:700;letter-spacing:0.04em;color:var(--bg);}
+.c-table td{padding:0.8rem 1.2rem;border-bottom:1px solid var(--border);color:#6a9a80;background:var(--s2);vertical-align:top;}
+.c-table tr:hover td{background:var(--s3);color:var(--text);}
+.c-table td:first-child{font-weight:600;color:var(--text);background:var(--s3);}
+
+/* ── ROM TYPES ── */
+.rom-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin:1.5rem 0;}
+.rom-card{background:var(--s2);padding:1.5rem;transition:background 0.2s;position:relative;overflow:hidden;}
+.rom-card:hover{background:var(--s3);}
+.rom-card::after{
+  content:attr(data-abbr);position:absolute;right:1rem;bottom:-0.5rem;
+  font-family:var(--font-head);font-size:4rem;font-weight:800;
+  opacity:0.05;color:var(--teal);line-height:1;
+}
+.rom-abbr{font-family:var(--font-mono);font-size:0.72rem;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.4rem;}
+.rom-name{font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:0.5rem;color:white;}
+.rom-desc{font-size:0.83rem;color:#6a9a80;line-height:1.6;}
+.rom-writable{font-family:var(--font-mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;margin-top:0.6rem;padding:0.2rem 0.6rem;border:1px solid;display:inline-block;}
+.rw-no{color:var(--red);border-color:rgba(255,107,107,0.3);}
+.rw-once{color:var(--amber);border-color:rgba(255,179,71,0.3);}
+.rw-uv{color:var(--blue);border-color:rgba(116,185,255,0.3);}
+.rw-yes{color:var(--teal);border-color:rgba(0,184,148,0.3);}
+
+/* ── INTERACTIVE MEMORY CALCULATOR ── */
+.calc-wrap{
+  background:var(--s2);border:2px solid var(--teal);
+  border-radius:3px;overflow:hidden;margin:1.5rem 0;
+}
+.calc-header{
+  background:var(--teal);padding:1rem 1.5rem;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.calc-title{font-family:var(--font-head);font-size:1rem;font-weight:800;color:var(--bg);letter-spacing:0.04em;}
+.calc-sub{font-family:var(--font-mono);font-size:0.68rem;color:rgba(0,30,20,0.6);}
+.calc-body{padding:1.5rem;}
+
+.calc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;}
+.calc-item{background:var(--s3);border:1px solid var(--border2);padding:1.2rem;text-align:center;}
+.calc-item-label{font-family:var(--font-mono);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.8rem;}
+.calc-item-val{font-family:var(--font-head);font-size:1.8rem;font-weight:800;color:var(--teal);line-height:1;}
+.calc-item-unit{font-family:var(--font-mono);font-size:0.68rem;color:var(--muted);margin-top:0.2rem;}
+
+.calc-controls{display:flex;flex-direction:column;gap:0.8rem;}
+.calc-row{display:flex;align-items:center;gap:1rem;}
+.calc-row label{font-family:var(--font-mono);font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;width:140px;flex-shrink:0;}
+.calc-slider{flex:1;accent-color:var(--teal);height:4px;cursor:pointer;}
+.calc-val{font-family:var(--font-mono);font-size:0.88rem;color:var(--teal);font-weight:600;width:60px;text-align:right;flex-shrink:0;}
+
+/* ── STORAGE CAPACITY ── */
+.cap-bar-wrap{margin:1.5rem 0;}
+.cap-bar-item{margin-bottom:0.8rem;}
+.cap-bar-label{display:flex;justify-content:space-between;margin-bottom:0.3rem;}
+.cap-bar-name{font-family:var(--font-mono);font-size:0.75rem;color:var(--text);}
+.cap-bar-val{font-family:var(--font-mono);font-size:0.75rem;color:var(--teal);}
+.cap-track{height:8px;background:var(--border);border-radius:1px;overflow:hidden;}
+.cap-fill{height:100%;border-radius:1px;transition:width 1s ease;}
+
+/* ── PAST PAPERS ── */
+.pp-list{display:flex;flex-direction:column;gap:0.8rem;}
+.pp-item{border:1px solid var(--border);overflow:hidden;transition:border-color 0.2s;}
+.pp-item:hover{border-color:var(--border2);}
+.pp-trigger{
+  width:100%;background:var(--s2);border:none;
+  padding:1rem 1.4rem;display:flex;align-items:flex-start;gap:0.9rem;
+  cursor:pointer;text-align:left;font-family:var(--font-body);transition:background 0.15s;
+}
+.pp-trigger:hover{background:var(--s3);}
+.pp-yr{font-family:var(--font-mono);font-size:0.62rem;font-weight:600;background:var(--teal);color:var(--bg);padding:0.2rem 0.6rem;white-space:nowrap;flex-shrink:0;margin-top:2px;}
+.pp-q{font-size:0.9rem;font-weight:600;color:var(--text);line-height:1.5;flex:1;}
+.pp-pts{font-family:var(--font-mono);font-size:0.62rem;color:var(--amber);border:1px solid rgba(255,179,71,0.3);padding:0.2rem 0.6rem;white-space:nowrap;flex-shrink:0;margin-top:2px;}
+.pp-body{display:none;padding:1.4rem;background:var(--s1);border-top:1px solid var(--border);font-size:0.87rem;line-height:1.8;color:#6a9a80;}
+.pp-body.open{display:block;}
+.model-ans{background:var(--s2);border:1px solid rgba(0,184,148,0.2);padding:1.2rem;}
+.model-lbl{font-family:var(--font-mono);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--teal);margin-bottom:0.8rem;font-weight:600;}
+.model-ans ul{padding-left:1.2rem;}
+.model-ans li{margin-bottom:0.6rem;color:var(--text);}
+.model-ans li strong{color:var(--teal);}
+
+/* ── QUIZ ── */
+.quiz{background:var(--s2);border:2px solid var(--teal);overflow:hidden;}
+.quiz-top{
+  background:linear-gradient(135deg,rgba(0,184,148,0.2),rgba(0,184,148,0.05));
+  border-bottom:1px solid var(--border2);
+  padding:1.5rem 2rem;display:flex;justify-content:space-between;align-items:center;
+}
+.quiz-top-l h3{font-family:var(--font-head);font-size:1.3rem;font-weight:800;color:white;}
+.quiz-top-l p{font-family:var(--font-mono);font-size:0.65rem;color:var(--muted);margin-top:0.2rem;}
+.q-counter{font-family:var(--font-head);font-size:2rem;font-weight:800;color:var(--teal);line-height:1;}
+.q-counter span{font-size:1rem;opacity:0.4;}
+.q-prog{height:3px;background:rgba(0,184,148,0.15);}
+.q-fill{height:100%;background:var(--teal);transition:width 0.4s;width:0%;}
+.quiz-inner{padding:2rem;}
+.qb{display:none;}
+.qb.active{display:block;}
+.q-src{font-family:var(--font-mono);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--amber);margin-bottom:0.8rem;}
+.q-txt{font-family:var(--font-head);font-size:1.05rem;font-weight:700;color:white;margin-bottom:1.8rem;line-height:1.5;}
+.opts{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.5rem;}
+.opt{background:var(--s3);border:1.5px solid var(--border2);padding:0.85rem 1.1rem;color:#6a9a80;font-family:var(--font-body);font-size:0.9rem;cursor:pointer;text-align:left;display:flex;align-items:center;gap:0.9rem;transition:all 0.15s;}
+.opt:hover:not(:disabled){border-color:var(--teal);color:var(--text);background:rgba(0,184,148,0.06);}
+.opt-k{font-family:var(--font-mono);font-size:0.7rem;font-weight:700;width:26px;height:26px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;}
+.opt:hover:not(:disabled) .opt-k{border-color:var(--teal);color:var(--teal);}
+.opt.correct{border-color:var(--teal);color:var(--teal);background:rgba(0,184,148,0.06);}
+.opt.correct .opt-k{background:var(--teal);color:var(--bg);border-color:var(--teal);}
+.opt.wrong{border-color:var(--red);color:#f0b0b0;background:rgba(255,107,107,0.05);}
+.opt.wrong .opt-k{background:var(--red);color:white;border-color:var(--red);}
+.opt:disabled{cursor:default;}
+.q-fb{display:none;padding:0.9rem 1.1rem;font-size:0.87rem;line-height:1.7;margin-bottom:1rem;border:1px solid;}
+.q-fb.show{display:block;}
+.q-fb.good{border-color:rgba(0,184,148,0.3);background:rgba(0,184,148,0.06);color:#90e0c8;}
+.q-fb.bad{border-color:rgba(255,107,107,0.3);background:rgba(255,107,107,0.05);color:#f0b0b0;}
+.q-fb strong{display:block;margin-bottom:0.3rem;font-family:var(--font-mono);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;}
+.quiz-foot{display:flex;justify-content:space-between;align-items:center;padding-top:1.2rem;border-top:1px solid var(--border);}
+.qbtn{font-family:var(--font-head);font-size:0.88rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;padding:0.65rem 1.4rem;cursor:pointer;border:none;transition:all 0.15s;}
+.qbtn-p{background:var(--teal);color:var(--bg);}
+.qbtn-p:hover{background:var(--teal2);}
+.qbtn-p:disabled{opacity:0.35;cursor:default;}
+.qbtn-g{background:transparent;color:var(--muted);border:1px solid var(--border2);}
+.qbtn-g:hover{color:var(--text);border-color:var(--muted);}
+.qbtn-g:disabled{opacity:0.3;cursor:default;}
+.score-scr{display:none;text-align:center;padding:3rem 2rem;}
+.score-scr.show{display:block;}
+.score-box{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:130px;height:130px;border:3px solid var(--teal);background:rgba(0,184,148,0.05);margin:0 auto 1.5rem;}
+.score-big{font-family:var(--font-head);font-size:3rem;font-weight:800;color:var(--teal);line-height:1;}
+.score-den{font-family:var(--font-mono);font-size:0.75rem;color:var(--muted);}
+.score-v{font-family:var(--font-head);font-size:1.1rem;font-weight:800;color:white;margin-bottom:0.5rem;}
+.score-a{font-size:0.85rem;color:var(--muted);margin-bottom:2rem;}
+
+footer{background:var(--s1);border-top:2px solid var(--teal);padding:1.5rem 2rem;display:flex;justify-content:space-between;align-items:center;font-family:var(--font-mono);font-size:0.7rem;color:var(--muted);position:relative;z-index:1;}
+footer a{color:var(--teal);text-decoration:none;}
+footer a:hover{opacity:0.7;}
+
+@media(max-width:700px){
+  .hero h1{font-size:2.5rem;}
+  .hero-stats{grid-template-columns:repeat(2,1fr);}
+  nav .nav-links{display:none;}
+  .content{padding:0 1.2rem 4rem;}
+  .rom-grid{grid-template-columns:1fr;}
+  .calc-grid{grid-template-columns:1fr;}
+  .mem-layer{grid-template-columns:1fr;}
+  .calc-row{flex-direction:column;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="CSC2101_index.html" class="nav-back">← HOME</a>
+  <span class="nav-path">CSC2101 / TOPIC-04 / MEMORY-AND-STORAGE</span>
+  <ul class="nav-links">
+    <li><a href="#hierarchy">§01</a></li>
+    <li><a href="#ram">§02</a></li>
+    <li><a href="#rom">§03</a></li>
+    <li><a href="#volatile">§04</a></li>
+    <li><a href="#storage">§05</a></li>
+    <li><a href="#tool">§06</a></li>
+    <li><a href="#past">§07</a></li>
+    <li><a href="#quiz">§08</a></li>
+  </ul>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-chip">Topic 04 · CSC 2101 Computer Systems</div>
+    <h1>Memory &amp;<br><span class="acc">Storage</span></h1>
+    <p class="hero-desc">RAM, ROM, Cache, HDD, SSD — the difference between speed and permanence. Know this and you're ready for questions across every exam paper.</p>
+    <div class="hero-tags">
+      <span class="htag ht-r">2025 Q1b · RAM vs ROM</span>
+      <span class="htag ht-t">DRAM vs SRAM</span>
+      <span class="htag ht-a">Volatile vs Non-Volatile</span>
+      <span class="htag ht-b">Cache · HDD · SSD</span>
+    </div>
+    <div class="hero-stats">
+      <div class="hs"><div class="hs-n">2</div><div class="hs-l">Memory Types</div></div>
+      <div class="hs"><div class="hs-n">4</div><div class="hs-l">ROM Variants</div></div>
+      <div class="hs"><div class="hs-n">9</div><div class="hs-l">Past Questions</div></div>
+      <div class="hs"><div class="hs-n">10</div><div class="hs-l">Quiz Questions</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="content">
+
+  <!-- §01 HIERARCHY -->
+  <section id="hierarchy" class="sec">
+    <p class="sec-label">§ 01</p>
+    <h2 class="sec-title">The Memory <span class="acc">Hierarchy</span></h2>
+    <hr class="sec-rule">
+
+    <div class="callout ct">
+      <strong>The Golden Rule</strong>
+      The closer memory is to the CPU, the faster it is — but also the smaller and more expensive it gets. The further away, the larger and cheaper — but slower. This trade-off is the memory hierarchy.
+    </div>
+
+    <div class="mem-pyramid">
+      <div class="mem-layer" style="--layer-color:var(--pink)">
+        <div>
+          <div class="mem-layer-name" style="color:var(--pink)">CPU Registers</div>
+        </div>
+        <div class="mem-layer-desc">Inside the CPU itself. Holds data actively being processed right now. PC, MAR, MBR, ACC, IR.</div>
+        <div class="mem-layer-specs">
+          <span class="mem-spec spec-speed">Speed: Fastest</span>
+          <span class="mem-spec spec-size">Size: Bytes</span>
+          <span class="mem-spec spec-cost">Cost: Highest</span>
+        </div>
+      </div>
+      <div class="mem-layer" style="--layer-color:var(--teal)">
+        <div>
+          <div class="mem-layer-name" style="color:var(--teal)">Cache Memory</div>
+        </div>
+        <div class="mem-layer-desc">SRAM built into/near CPU. Stores recently used data so CPU doesn't repeatedly fetch from RAM. L1 → L2 → L3.</div>
+        <div class="mem-layer-specs">
+          <span class="mem-spec spec-speed">Speed: Very Fast</span>
+          <span class="mem-spec spec-size">Size: KB–MB</span>
+          <span class="mem-spec spec-cost">Cost: High</span>
+        </div>
+      </div>
+      <div class="mem-layer" style="--layer-color:var(--amber)">
+        <div>
+          <div class="mem-layer-name" style="color:var(--amber)">RAM (Main Memory)</div>
+        </div>
+        <div class="mem-layer-desc">Temporary working memory. Holds programs and data currently in use. Volatile — lost on power off. DRAM-based.</div>
+        <div class="mem-layer-specs">
+          <span class="mem-spec spec-speed">Speed: Fast</span>
+          <span class="mem-spec spec-size">Size: GB</span>
+          <span class="mem-spec spec-cost">Cost: Medium</span>
+        </div>
+      </div>
+      <div class="mem-layer" style="--layer-color:var(--blue)">
+        <div>
+          <div class="mem-layer-name" style="color:var(--blue)">Secondary Storage</div>
+        </div>
+        <div class="mem-layer-desc">Permanent non-volatile storage. HDD, SSD, USB drives. Data persists without power. Loaded into RAM when needed.</div>
+        <div class="mem-layer-specs">
+          <span class="mem-spec spec-speed">Speed: Slower</span>
+          <span class="mem-spec spec-size">Size: TB</span>
+          <span class="mem-spec spec-cost">Cost: Low</span>
+        </div>
+      </div>
+      <div class="mem-layer" style="--layer-color:var(--muted)">
+        <div>
+          <div class="mem-layer-name" style="color:var(--muted)">Offline/Archival Storage</div>
+        </div>
+        <div class="mem-layer-desc">Magnetic tape, optical discs. Very cheap per GB. Used for backups and long-term archiving. Accessed rarely.</div>
+        <div class="mem-layer-specs">
+          <span class="mem-spec spec-speed">Speed: Slowest</span>
+          <span class="mem-spec spec-size">Size: TB+</span>
+          <span class="mem-spec spec-cost">Cost: Lowest</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §02 RAM -->
+  <section id="ram" class="sec">
+    <p class="sec-label">§ 02</p>
+    <h2 class="sec-title">RAM — <span class="acc">Random Access Memory</span></h2>
+    <hr class="sec-rule">
+
+    <div class="callout cr">
+      <strong>⚠ Exam Alert — 2025 Q1b · 2015 Q3c · CIT3100</strong>
+      "Explain the difference between RAM and ROM" (4 marks), "Compare DRAM and SRAM" — these appear repeatedly. Know RAM cold.
+    </div>
+
+    <div class="callout ca">
+      <strong>Definition</strong>
+      RAM (Random Access Memory) is the computer's temporary working memory. It stores programs and data currently being used by the CPU. It is <strong>volatile</strong> — all data is lost when the computer is switched off. More RAM = better multitasking performance.
+    </div>
+
+    <h3 style="font-family:var(--font-head);font-size:1.2rem;font-weight:700;color:white;margin:1.5rem 0 0.8rem">DRAM vs SRAM</h3>
+
+    <table class="c-table">
+      <thead><tr><th>Feature</th><th>DRAM (Dynamic RAM)</th><th>SRAM (Static RAM)</th></tr></thead>
+      <tbody>
+        <tr><td>Full name</td><td>Dynamic Random Access Memory</td><td>Static Random Access Memory</td></tr>
+        <tr><td>How it works</td><td>Stores each bit as a charge in a capacitor. Must be constantly refreshed (thousands of times/sec)</td><td>Uses flip-flop circuits to hold data. No refreshing needed while powered.</td></tr>
+        <tr><td>Speed</td><td>Slower</td><td>Much faster</td></tr>
+        <tr><td>Cost</td><td>Cheaper</td><td>More expensive</td></tr>
+        <tr><td>Density</td><td>Higher — more bits per chip</td><td>Lower — takes more space per bit</td></tr>
+        <tr><td>Power use</td><td>Uses more power (constant refresh)</td><td>Uses less power</td></tr>
+        <tr><td>Used for</td><td>Main memory (RAM sticks in your PC)</td><td>Cache memory (L1, L2, L3 inside CPU)</td></tr>
+        <tr><td>Volatile?</td><td>Yes — loses data without power</td><td>Yes — loses data without power</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-family:var(--font-head);font-size:1.2rem;font-weight:700;color:white;margin:1.5rem 0 0.8rem">Other RAM Types</h3>
+    <table class="c-table">
+      <thead><tr><th>Type</th><th>What it means</th><th>Where used</th></tr></thead>
+      <tbody>
+        <tr><td>SDRAM</td><td>Synchronous DRAM — synced to CPU clock speed</td><td>Older desktop computers</td></tr>
+        <tr><td>DDR SDRAM</td><td>Double Data Rate — transfers data twice per clock cycle</td><td>Modern PCs (DDR3, DDR4, DDR5)</td></tr>
+        <tr><td>DDR4</td><td>4th generation DDR — faster, lower voltage than DDR3</td><td>Current standard for PCs/laptops</td></tr>
+        <tr><td>DDR5</td><td>5th generation — highest bandwidth, latest standard</td><td>Latest high-end PCs</td></tr>
+        <tr><td>GDDR</td><td>Graphics DDR — optimised for parallel graphics data</td><td>GPU video memory (graphics cards)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- §03 ROM -->
+  <section id="rom" class="sec">
+    <p class="sec-label">§ 03</p>
+    <h2 class="sec-title">ROM — <span class="acc">Read-Only Memory</span></h2>
+    <hr class="sec-rule">
+
+    <div class="callout ca">
+      <strong>Definition</strong>
+      ROM (Read-Only Memory) is non-volatile memory that retains its data even when the computer is switched off. It is pre-programmed by the manufacturer. The BIOS/UEFI firmware that starts your computer is stored in ROM.
+    </div>
+
+    <div class="callout cr">
+      <strong>⚠ Exam Alert — 2025 Q1b · 2015 Q3d · CIT3100</strong>
+      "Differentiate ROM and RAM" — 4 marks. "Discuss PROM and EPROM ROM variations" — 2015 exam. Know all 4 ROM types.
+    </div>
+
+    <div class="rom-grid">
+      <div class="rom-card" data-abbr="ROM">
+        <div class="rom-abbr">ROM</div>
+        <div class="rom-name">Read-Only Memory</div>
+        <div class="rom-desc">Factory-programmed. Cannot be changed by the user at all. Contains permanent firmware like the original BIOS. Data survives without power.</div>
+        <div class="rom-writable rw-no">Not writable</div>
+      </div>
+      <div class="rom-card" data-abbr="PROM">
+        <div class="rom-abbr">PROM</div>
+        <div class="rom-name">Programmable ROM</div>
+        <div class="rom-desc">Can be written to ONCE by the user using a special PROM programmer device. After programming, it behaves like regular ROM — cannot be changed again.</div>
+        <div class="rom-writable rw-once">Write once only</div>
+      </div>
+      <div class="rom-card" data-abbr="EPROM">
+        <div class="rom-abbr">EPROM</div>
+        <div class="rom-name">Erasable PROM</div>
+        <div class="rom-desc">Can be erased by exposing it to strong ultraviolet (UV) light for 15–20 minutes, then reprogrammed. Has a small quartz window on the chip for UV exposure.</div>
+        <div class="rom-writable rw-uv">Erasable with UV light</div>
+      </div>
+      <div class="rom-card" data-abbr="EEPROM">
+        <div class="rom-abbr">EEPROM</div>
+        <div class="rom-name">Electrically Erasable PROM</div>
+        <div class="rom-desc">Can be erased and reprogrammed electrically — no UV needed. Modern BIOS chips use EEPROM. Flash memory (USB drives, SSDs) is a type of EEPROM.</div>
+        <div class="rom-writable rw-yes">Electrically erasable</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §04 VOLATILE vs NON-VOLATILE -->
+  <section id="volatile" class="sec">
+    <p class="sec-label">§ 04</p>
+    <h2 class="sec-title">Volatile vs <span class="acc">Non-Volatile</span></h2>
+    <hr class="sec-rule">
+
+    <div class="callout cr">
+      <strong>⚠ Exam Alert — 2025 Q3d (5 marks) · Dec 2015 Q3c</strong>
+      "Differentiate between volatile and non-volatile memory, giving examples." Comes up every year. Simple marks if you know the definition + examples.
+    </div>
+
+    <table class="c-table">
+      <thead><tr><th>Feature</th><th>Volatile Memory</th><th>Non-Volatile Memory</th></tr></thead>
+      <tbody>
+        <tr><td>Definition</td><td>Loses all data when power is removed</td><td>Retains data even without power</td></tr>
+        <tr><td>Examples</td><td>RAM (DRAM, SRAM), CPU Cache, CPU Registers</td><td>ROM, HDD, SSD, USB flash drive, CD/DVD, Magnetic tape</td></tr>
+        <tr><td>Speed</td><td>Generally faster</td><td>Generally slower (except SSD which is fast)</td></tr>
+        <tr><td>Use</td><td>Temporary working memory while computer runs</td><td>Permanent storage of OS, files, programs</td></tr>
+        <tr><td>What happens at shutdown</td><td>All data wiped — must save to storage first</td><td>Data preserved — available at next boot</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout ct">
+      <strong>Exam Answer Template — 2025 Q3d</strong>
+      "Volatile memory loses its data when power is switched off. Examples include RAM and CPU cache. Non-volatile memory retains data without power. Examples include ROM, HDD, SSD, and USB flash drives. Volatile memory is used for temporary working data while the computer runs; non-volatile is used for permanent storage of the operating system, applications, and user files."
+    </div>
+
+    <h3 style="font-family:var(--font-head);font-size:1.2rem;font-weight:700;color:white;margin:1.5rem 0 0.8rem">RAM vs ROM — The Classic 4-Mark Question</h3>
+    <table class="c-table">
+      <thead><tr><th>Feature</th><th>RAM</th><th>ROM</th></tr></thead>
+      <tbody>
+        <tr><td>Full name</td><td>Random Access Memory</td><td>Read-Only Memory</td></tr>
+        <tr><td>Volatile?</td><td>Yes — data lost on power off</td><td>No — data retained without power</td></tr>
+        <tr><td>Writable?</td><td>Yes — CPU reads and writes constantly</td><td>No (or very limited) — read only</td></tr>
+        <tr><td>Contents</td><td>Currently running programs and data</td><td>Firmware, BIOS — permanent instructions</td></tr>
+        <tr><td>Speed</td><td>Faster</td><td>Slower to read</td></tr>
+        <tr><td>Modified by user?</td><td>Yes — changes every time programs run</td><td>No — set by manufacturer</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- §05 SECONDARY STORAGE -->
+  <section id="storage" class="sec">
+    <p class="sec-label">§ 05</p>
+    <h2 class="sec-title">Secondary <span class="acc">Storage</span></h2>
+    <hr class="sec-rule">
+
+    <div class="callout ca">
+      <strong>Key Point</strong>
+      Secondary storage is non-volatile and holds data permanently. When you open a program, the OS copies it from secondary storage into RAM. When you save a file, it goes back to secondary storage.
+    </div>
+
+    <h3 style="font-family:var(--font-head);font-size:1.2rem;font-weight:700;color:white;margin-bottom:0.8rem">Storage Types by Technology</h3>
+    <table class="c-table">
+      <thead><tr><th>Technology</th><th>Examples</th><th>How it works</th><th>Key characteristics</th></tr></thead>
+      <tbody>
+        <tr><td>Magnetic</td><td>HDD, Tape drive</td><td>Magnetised/demagnetised areas on spinning platters or tape</td><td>Cheap per GB, slow, moving parts, fragile</td></tr>
+        <tr><td>Solid State</td><td>SSD, USB flash drive, SD card</td><td>Electrical charges in NAND flash memory cells</td><td>Fast, durable, silent, no moving parts, pricier</td></tr>
+        <tr><td>Optical</td><td>CD, DVD, Blu-ray</td><td>Laser reads/writes pits and lands on disc surface</td><td>Portable, cheap, easily scratched, lower capacity</td></tr>
+        <tr><td>Hybrid</td><td>SSHD (Solid State Hybrid)</td><td>Combines HDD platters + small SSD flash cache</td><td>Faster than HDD, cheaper than SSD</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-family:var(--font-head);font-size:1.2rem;font-weight:700;color:white;margin:1.5rem 0 0.8rem">Storage Capacity Reference</h3>
+    <div class="cap-bar-wrap" id="cap-bars"></div>
+
+    <div class="callout cb">
+      <strong>Cache Memory — Exam Extra (2025 Q3b, CIT3100)</strong>
+      Cache sits between CPU and RAM. L1 (fastest, ~32KB, inside CPU core), L2 (~256KB, inside CPU), L3 (~8MB+, shared across cores). When CPU needs data it checks L1 first, then L2, L3, then RAM. The further it has to go, the slower the access.
+    </div>
+  </section>
+
+  <!-- §06 INTERACTIVE TOOL -->
+  <section id="tool" class="sec">
+    <p class="sec-label">§ 06</p>
+    <h2 class="sec-title">Memory <span class="acc">Estimator</span></h2>
+    <hr class="sec-rule">
+
+    <p style="color:var(--muted);font-family:var(--font-mono);font-size:0.75rem;margin-bottom:1rem">// Adjust sliders to see how memory specs affect performance — useful for exam application questions</p>
+
+    <div class="calc-wrap">
+      <div class="calc-header">
+        <div class="calc-title">MEMORY PERFORMANCE ESTIMATOR</div>
+        <div class="calc-sub">adjust specs → see impact</div>
+      </div>
+      <div class="calc-body">
+        <div class="calc-grid">
+          <div class="calc-item">
+            <div class="calc-item-label">RAM Capacity</div>
+            <div class="calc-item-val" id="e-ram">8</div>
+            <div class="calc-item-unit">GB</div>
+          </div>
+          <div class="calc-item">
+            <div class="calc-item-label">Cache Size</div>
+            <div class="calc-item-val" id="e-cache">4</div>
+            <div class="calc-item-unit">MB</div>
+          </div>
+          <div class="calc-item">
+            <div class="calc-item-label">Storage Type</div>
+            <div class="calc-item-val" id="e-storage" style="font-size:1.2rem">SSD</div>
+            <div class="calc-item-unit" id="e-storage-speed">~500 MB/s</div>
+          </div>
+        </div>
+        <div class="calc-controls">
+          <div class="calc-row">
+            <label>RAM (GB)</label>
+            <input type="range" class="calc-slider" id="s-ram" min="2" max="64" value="8" step="2" oninput="updateCalc()">
+            <span class="calc-val" id="sv-ram">8 GB</span>
+          </div>
+          <div class="calc-row">
+            <label>Cache (MB)</label>
+            <input type="range" class="calc-slider" id="s-cache" min="1" max="32" value="4" oninput="updateCalc()">
+            <span class="calc-val" id="sv-cache">4 MB</span>
+          </div>
+          <div class="calc-row">
+            <label>Storage</label>
+            <input type="range" class="calc-slider" id="s-stor" min="0" max="3" value="2" step="1" oninput="updateCalc()">
+            <span class="calc-val" id="sv-stor">SSD</span>
+          </div>
+        </div>
+        <div style="margin-top:1.2rem;background:var(--s3);border:1px solid var(--border2);padding:1rem;font-family:var(--font-mono);font-size:0.78rem;color:var(--muted);line-height:1.9;" id="calc-verdict"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §07 PAST PAPERS -->
+  <section id="past" class="sec">
+    <p class="sec-label">§ 07</p>
+    <h2 class="sec-title">Past Paper <span class="acc">Questions</span></h2>
+    <hr class="sec-rule">
+
+    <p style="color:var(--muted);font-size:0.85rem;font-family:var(--font-mono);margin-bottom:1.5rem">// Think before you click. Answer in your head first.</p>
+
+    <div class="pp-list">
+
+      <div class="pp-item">
+        <button class="pp-trigger" onclick="togglePP(this)">
+          <span class="pp-yr">2025</span>
+          <span class="pp-q">Explain the difference between RAM and ROM (4 marks)</span>
+          <span class="pp-pts">4 marks</span>
+        </button>
+        <div class="pp-body">
+          <div class="model-ans">
+            <div class="model-lbl">Model Answer</div>
+            <ul>
+              <li><strong>RAM (Random Access Memory)</strong> is volatile temporary memory — it stores programs and data currently in use by the CPU, but all data is lost when the computer is switched off.</li>
+              <li><strong>ROM (Read-Only Memory)</strong> is non-volatile permanent memory — it retains its data without power and contains firmware like the BIOS that is pre-programmed by the manufacturer.</li>
+              <li><strong>Key difference 1:</strong> RAM is volatile; ROM is non-volatile.</li>
+              <li><strong>Key difference 2:</strong> RAM can be read and written by the CPU; ROM can only be read (normally).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pp-item">
+        <button class="pp-trigger" onclick="togglePP(this)">
+          <span class="pp-yr">2025</span>
+          <span class="pp-q">Differentiate between volatile and non-volatile memory, giving examples (5 marks)</span>
+          <span class="pp-pts">5 marks</span>
+        </button>
+        <div class="pp-body">
+          <div class="model-ans">
+            <div class="model-lbl">Model Answer</div>
+            <ul>
+              <li><strong>Volatile memory</strong> loses all stored data when electrical power is removed. It is used for temporary working storage while the computer is running.</li>
+              <li><strong>Examples of volatile:</strong> RAM (DRAM, SRAM), CPU Cache, CPU Registers.</li>
+              <li><strong>Non-volatile memory</strong> retains its data even without power. It is used for permanent storage of the OS, applications, and user files.</li>
+              <li><strong>Examples of non-volatile:</strong> ROM, HDD, SSD, USB flash drive, CD/DVD, magnetic tape.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pp-item">
+        <button class="pp-trigger" onclick="togglePP(this)">
+          <span class="pp-yr">2015</span>
+          <span class="pp-q">Compare and contrast DRAM and SRAM</span>
+          <span class="pp-pts">6 marks</span>
+        </button>
+        <div class="pp-body">
+          <div class="model-ans">
+            <div class="model-lbl">Model Answer</div>
+            <ul>
+              <li><strong>DRAM</strong> stores each bit as an electrical charge in a capacitor and must be constantly refreshed. It is slower, cheaper, denser, and used for main memory (RAM sticks).</li>
+              <li><strong>SRAM</strong> uses flip-flop circuits to hold bits without refreshing. It is much faster, more expensive, less dense, and used for cache memory (L1, L2, L3).</li>
+              <li><strong>Similarity:</strong> Both are volatile — they lose data without power.</li>
+              <li><strong>Summary:</strong> DRAM = cheap, slow, large capacity (main memory). SRAM = fast, expensive, small (cache).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pp-item">
+        <button class="pp-trigger" onclick="togglePP(this)">
+          <span class="pp-yr">2015</span>
+          <span class="pp-q">Discuss PROM and EPROM ROM variations</span>
+          <span class="pp-pts">4 marks</span>
+        </button>
+        <div class="pp-body">
+          <div class="model-ans">
+            <div class="model-lbl">Model Answer (2 marks each)</div>
+            <ul>
+              <li><strong>PROM (Programmable ROM):</strong> Can be programmed once by the user using a special PROM programmer device. Once written, it cannot be changed — it behaves like regular ROM. Used where custom permanent data is needed.</li>
+              <li><strong>EPROM (Erasable PROM):</strong> Can be erased by exposing the chip to ultraviolet (UV) light for approximately 15–20 minutes through a quartz window on the chip, then reprogrammed. Allows reuse of the chip unlike PROM.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pp-item">
+        <button class="pp-trigger" onclick="togglePP(this)">
+          <span class="pp-yr">CIT3100</span>
+          <span class="pp-q">Explain three key differences between Main Memory and Secondary Memory</span>
+          <span class="pp-pts">6 marks</span>
+        </button>
+        <div class="pp-body">
+          <div class="model-ans">
+            <div class="model-lbl">Model Answer (2 marks each)</div>
+            <ul>
+              <li><strong>Volatility:</strong> Main memory (RAM) is volatile — data is lost when power is removed. Secondary memory (HDD, SSD) is non-volatile — data is retained permanently.</li>
+              <li><strong>Speed:</strong> Main memory is much faster to access than secondary memory. The CPU can access RAM in nanoseconds, while secondary storage takes milliseconds (HDD) or microseconds (SSD).</li>
+              <li><strong>Capacity and cost:</strong> Secondary memory has far larger capacity (TBs) at much lower cost per GB. Main memory is smaller (GBs) and more expensive per GB.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pp-item">
+        <button class="pp-trigger" onclick="togglePP(this)">
+          <span class="pp-yr">Dec 2015</span>
+          <span class="pp-q">Provide 2 examples of volatile storage and 2 examples of non-volatile storage</span>
+          <span class="pp-pts">4 marks</span>
+        </button>
+        <div class="pp-body">
+          <div class="model-ans">
+            <div class="model-lbl">Model Answer (1 mark each)</div>
+            <ul>
+              <li><strong>Volatile (1):</strong> RAM — temporary working memory that loses data on power off.</li>
+              <li><strong>Volatile (2):</strong> CPU Cache (SRAM) — fast memory inside/near CPU that loses data without power.</li>
+              <li><strong>Non-volatile (1):</strong> HDD — magnetic spinning drive that retains data permanently.</li>
+              <li><strong>Non-volatile (2):</strong> SSD — flash memory drive that retains data without power.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- §08 QUIZ -->
+  <section id="quiz" class="sec">
+    <p class="sec-label">§ 08</p>
+    <h2 class="sec-title">Test <span class="acc">Yourself</span></h2>
+    <hr class="sec-rule">
+
+    <div class="quiz">
+      <div class="quiz-top">
+        <div class="quiz-top-l">
+          <h3>Memory &amp; Storage Quiz</h3>
+          <p>10 questions // exam-style</p>
+        </div>
+        <div class="q-counter"><span id="qn">1</span><span> / 10</span></div>
+      </div>
+      <div class="q-prog"><div class="q-fill" id="qf"></div></div>
+      <div class="quiz-inner">
+
+        <div class="qb active" data-i="0">
+          <p class="q-src">2025 Final · Q1b</p>
+          <p class="q-txt">Which statement BEST describes RAM?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'ROM is non-volatile and stores firmware. RAM is the temporary working memory.')"><span class="opt-k">A</span>It permanently stores the computer's firmware and BIOS</button>
+            <button class="opt" onclick="pick(this,true,'Correct! RAM is volatile temporary working memory. It holds currently running programs and data, but loses everything when power is cut.')"><span class="opt-k">B</span>It temporarily stores programs and data in use, losing all data on power off</button>
+            <button class="opt" onclick="pick(this,false,'HDD/SSD is the permanent long-term storage. RAM is temporary.')"><span class="opt-k">C</span>It permanently stores all user files and the operating system</button>
+            <button class="opt" onclick="pick(this,false,'Cache is inside/near the CPU. RAM is separate memory chips on the motherboard.')"><span class="opt-k">D</span>It is located inside the CPU and holds register values</button>
+          </div>
+          <div class="q-fb" id="f0"></div>
+        </div>
+
+        <div class="qb" data-i="1">
+          <p class="q-src">2025 Final · Q3d</p>
+          <p class="q-txt">Which of the following is an example of NON-VOLATILE memory?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'RAM is volatile — it loses all data when the computer is switched off.')"><span class="opt-k">A</span>RAM</button>
+            <button class="opt" onclick="pick(this,false,'CPU Cache (SRAM) is volatile — it loses data without power.')"><span class="opt-k">B</span>CPU Cache</button>
+            <button class="opt" onclick="pick(this,true,'Correct! An SSD (Solid State Drive) is non-volatile — it retains data permanently without power using flash memory cells.')"><span class="opt-k">C</span>SSD</button>
+            <button class="opt" onclick="pick(this,false,'CPU Registers are volatile — they lose data the moment power is removed.')"><span class="opt-k">D</span>CPU Registers</button>
+          </div>
+          <div class="q-fb" id="f1"></div>
+        </div>
+
+        <div class="qb" data-i="2">
+          <p class="q-src">2015 Final · Q3c</p>
+          <p class="q-txt">What is the main difference between DRAM and SRAM?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'Both DRAM and SRAM are volatile — they both lose data without power.')"><span class="opt-k">A</span>DRAM is non-volatile; SRAM is volatile</button>
+            <button class="opt" onclick="pick(this,false,'The opposite is true — SRAM is faster and used for cache; DRAM is slower and used for main memory.')"><span class="opt-k">B</span>DRAM is faster and used for cache; SRAM is slower and used for main memory</button>
+            <button class="opt" onclick="pick(this,true,'Correct! DRAM needs constant electrical refreshing (capacitors), is cheaper and slower — used for main RAM. SRAM uses flip-flops, needs no refresh, is faster and more expensive — used for cache.')"><span class="opt-k">C</span>DRAM requires constant refreshing and is used for main memory; SRAM needs no refreshing and is used for cache</button>
+            <button class="opt" onclick="pick(this,false,'Both are types of RAM — volatile, temporary memory. Neither is non-volatile.')"><span class="opt-k">D</span>DRAM is permanent storage; SRAM is temporary</button>
+          </div>
+          <div class="q-fb" id="f2"></div>
+        </div>
+
+        <div class="qb" data-i="3">
+          <p class="q-src">2015 Final · Q3d</p>
+          <p class="q-txt">How is an EPROM chip erased so it can be reprogrammed?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'Electrical erasure is how EEPROM works — not EPROM. These are different types.')"><span class="opt-k">A</span>By passing an electrical current through it</button>
+            <button class="opt" onclick="pick(this,true,'Correct! EPROM (Erasable PROM) is erased by exposing the chip to ultraviolet (UV) light through its quartz window for about 15–20 minutes.')"><span class="opt-k">B</span>By exposing it to ultraviolet (UV) light through its quartz window</button>
+            <button class="opt" onclick="pick(this,false,'Formatting is for storage devices like HDDs. Not applicable to EPROM chips.')"><span class="opt-k">C</span>By formatting it like a hard drive</button>
+            <button class="opt" onclick="pick(this,false,'Heating would damage the chip. EPROM uses UV light, not heat.')"><span class="opt-k">D</span>By heating it to a high temperature</button>
+          </div>
+          <div class="q-fb" id="f3"></div>
+        </div>
+
+        <div class="qb" data-i="4">
+          <p class="q-src">CIT3100 · Q1e</p>
+          <p class="q-txt">In the memory hierarchy, which level is the FASTEST but SMALLEST?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'RAM is fast but not the fastest — it\'s below cache and registers in the hierarchy.')"><span class="opt-k">A</span>RAM</button>
+            <button class="opt" onclick="pick(this,false,'HDD is actually the slowest in the hierarchy — mechanical spinning platters.')"><span class="opt-k">B</span>HDD</button>
+            <button class="opt" onclick="pick(this,false,'Cache is very fast but CPU registers are even faster — they\'re literally inside the processor.')"><span class="opt-k">C</span>Cache Memory (L1)</button>
+            <button class="opt" onclick="pick(this,true,'Correct! CPU Registers are the fastest memory — built directly into the CPU. They hold only bytes of data but access is instantaneous.')"><span class="opt-k">D</span>CPU Registers</button>
+          </div>
+          <div class="q-fb" id="f4"></div>
+        </div>
+
+        <div class="qb" data-i="5">
+          <p class="q-src">2025 Final · Q1b</p>
+          <p class="q-txt">What is stored in ROM?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'Currently running programs go in RAM, not ROM. ROM doesn\'t change while the computer runs.')"><span class="opt-k">A</span>Programs currently being executed by the CPU</button>
+            <button class="opt" onclick="pick(this,false,'User documents are stored on HDD/SSD. Not in ROM.')"><span class="opt-k">B</span>The user\'s documents and personal files</button>
+            <button class="opt" onclick="pick(this,true,'Correct! ROM contains firmware like the BIOS/UEFI — permanent instructions pre-programmed by the manufacturer that run when the computer first starts. It is non-volatile and read-only.')"><span class="opt-k">C</span>Permanent firmware like BIOS — pre-programmed startup instructions</button>
+            <button class="opt" onclick="pick(this,false,'The OS is loaded from HDD/SSD into RAM at startup. The OS itself doesn\'t live in ROM.')"><span class="opt-k">D</span>The operating system files</button>
+          </div>
+          <div class="q-fb" id="f5"></div>
+        </div>
+
+        <div class="qb" data-i="6">
+          <p class="q-src">Dec 2015 · Q3c</p>
+          <p class="q-txt">You close a document without saving. When you restart the computer, the document is gone. Why?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'The OS didn\'t delete it — the document was in volatile RAM and was lost when power was cut.')"><span class="opt-k">A</span>The operating system automatically deletes unsaved files</button>
+            <button class="opt" onclick="pick(this,true,'Correct! The unsaved document existed only in volatile RAM. When the computer lost power, RAM lost all its data. Since it was never written to non-volatile storage (HDD/SSD), it\'s gone.')"><span class="opt-k">B</span>The document was in volatile RAM — it was lost when power was removed</button>
+            <button class="opt" onclick="pick(this,false,'Viruses don\'t explain normal data loss on shutdown. This is standard volatile memory behaviour.')"><span class="opt-k">C</span>A virus deleted the file</button>
+            <button class="opt" onclick="pick(this,false,'The Recycle Bin only holds deleted files — unsaved documents never reached storage in the first place.')"><span class="opt-k">D</span>The document moved to the Recycle Bin automatically</button>
+          </div>
+          <div class="q-fb" id="f6"></div>
+        </div>
+
+        <div class="qb" data-i="7">
+          <p class="q-src">CIT3100 Supp · Q4d</p>
+          <p class="q-txt">Which type of ROM can be erased and reprogrammed electrically — no UV light needed?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'PROM can only be programmed once — it cannot be erased at all.')"><span class="opt-k">A</span>PROM</button>
+            <button class="opt" onclick="pick(this,false,'EPROM requires UV light for erasure — not electrical. That\'s a key distinction.')"><span class="opt-k">B</span>EPROM</button>
+            <button class="opt" onclick="pick(this,false,'Standard ROM is factory-set and cannot be erased or reprogrammed.')"><span class="opt-k">C</span>ROM</button>
+            <button class="opt" onclick="pick(this,true,'Correct! EEPROM (Electrically Erasable PROM) can be erased and reprogrammed using electrical signals. Modern BIOS chips and USB flash drives use EEPROM/flash technology.')"><span class="opt-k">D</span>EEPROM</button>
+          </div>
+          <div class="q-fb" id="f7"></div>
+        </div>
+
+        <div class="qb" data-i="8">
+          <p class="q-src">CIT3100 · Q1e</p>
+          <p class="q-txt">Why is cache memory used in computers?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'Cache doesn\'t store user files — that\'s secondary storage. Cache stores CPU working data.')"><span class="opt-k">A</span>To store the user\'s files permanently</button>
+            <button class="opt" onclick="pick(this,false,'Cache doesn\'t run the OS — that\'s RAM\'s job.')"><span class="opt-k">B</span>To run the operating system</button>
+            <button class="opt" onclick="pick(this,true,'Correct! Cache stores recently/frequently used data and instructions so the CPU can access them without going all the way to slower RAM. This significantly speeds up processing.')"><span class="opt-k">C</span>To store frequently used data close to the CPU, reducing the need to access slower RAM</button>
+            <button class="opt" onclick="pick(this,false,'Firmware/BIOS is stored in ROM, not cache.')"><span class="opt-k">D</span>To hold the BIOS firmware at startup</button>
+          </div>
+          <div class="q-fb" id="f8"></div>
+        </div>
+
+        <div class="qb" data-i="9">
+          <p class="q-src">2015 Final · Q3</p>
+          <p class="q-txt">A student adds more RAM to their computer. What is the most likely result?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'RAM doesn\'t affect storage capacity — you need a bigger HDD/SSD for that.')"><span class="opt-k">A</span>The computer can store more files permanently</button>
+            <button class="opt" onclick="pick(this,false,'More RAM doesn\'t directly improve internet speed — that depends on your network.')"><span class="opt-k">B</span>The internet connection becomes faster</button>
+            <button class="opt" onclick="pick(this,true,'Correct! More RAM means the computer can hold more programs and data in memory simultaneously. This improves multitasking — switching between apps is smoother and the system is less likely to slow down under load.')"><span class="opt-k">C</span>The computer can run more programs simultaneously without slowing down</button>
+            <button class="opt" onclick="pick(this,false,'RAM doesn\'t improve graphics — that requires a better GPU and GDDR memory.')"><span class="opt-k">D</span>Graphics performance immediately doubles</button>
+          </div>
+          <div class="q-fb" id="f9"></div>
+        </div>
+
+        <div class="score-scr" id="scr">
+          <div class="score-box">
+            <div class="score-big" id="sc-n">0</div>
+            <div class="score-den">/ 10</div>
+          </div>
+          <p class="score-v" id="sc-v"></p>
+          <p class="score-a" id="sc-a"></p>
+          <button class="qbtn qbtn-p" onclick="resetQ()">RETRY</button>
+        </div>
+
+        <div class="quiz-foot" id="qfoot">
+          <button class="qbtn qbtn-g" id="qprev" onclick="prevQ()" disabled>← PREV</button>
+          <button class="qbtn qbtn-p" id="qnext" onclick="nextQ()" disabled>NEXT →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <span>CSC 2101 // TOPIC-04 // MEMORY & STORAGE</span>
+  <a href="CSC2101_index.html">← BACK TO HOME</a>
+</footer>
+
+<script>
+// SCROLL REVEAL
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:0.08});
+document.querySelectorAll('.sec').forEach(s=>obs.observe(s));
+
+// CAPACITY BARS
+const caps=[
+  {name:'CPU Register',val:0.0001,display:'~256 B',color:'var(--pink)'},
+  {name:'L1 Cache',val:0.001,display:'~32 KB',color:'var(--teal)'},
+  {name:'L2 Cache',val:0.005,display:'~256 KB',color:'var(--teal2)'},
+  {name:'L3 Cache',val:0.02,display:'~8 MB',color:'var(--amber)'},
+  {name:'RAM',val:0.15,display:'8–64 GB',color:'var(--amber2)'},
+  {name:'SSD',val:0.6,display:'256 GB–4 TB',color:'var(--blue)'},
+  {name:'HDD',val:1.0,display:'500 GB–20 TB',color:'var(--muted)'},
+];
+const barsEl=document.getElementById('cap-bars');
+caps.forEach(c=>{
+  barsEl.innerHTML+=`
+    <div class="cap-bar-item">
+      <div class="cap-bar-label">
+        <span class="cap-bar-name">${c.name}</span>
+        <span class="cap-bar-val">${c.display}</span>
+      </div>
+      <div class="cap-track">
+        <div class="cap-fill" style="width:${c.val*100}%;background:${c.color}"></div>
+      </div>
+    </div>`;
+});
+
+// MEMORY ESTIMATOR
+const storTypes=[
+  {name:'Tape',speed:'~150 MB/s sequential'},
+  {name:'HDD',speed:'~150 MB/s read'},
+  {name:'SSD',speed:'~500 MB/s read'},
+  {name:'NVMe SSD',speed:'~3500 MB/s read'},
+];
+
+function updateCalc(){
+  const ram=parseInt(document.getElementById('s-ram').value);
+  const cache=parseInt(document.getElementById('s-cache').value);
+  const stor=parseInt(document.getElementById('s-stor').value);
+  const st=storTypes[stor];
+
+  document.getElementById('e-ram').textContent=ram;
+  document.getElementById('e-cache').textContent=cache;
+  document.getElementById('e-storage').textContent=st.name;
+  document.getElementById('e-storage-speed').textContent=st.speed;
+  document.getElementById('sv-ram').textContent=ram+' GB';
+  document.getElementById('sv-cache').textContent=cache+' MB';
+  document.getElementById('sv-stor').textContent=st.name;
+
+  let verdict='';
+  if(ram<=4) verdict+='⚠ RAM: Only '+ram+'GB — expect slowdowns with multiple apps open.\n';
+  else if(ram<=16) verdict+='✓ RAM: '+ram+'GB — solid for everyday use and studying.\n';
+  else verdict+='✓ RAM: '+ram+'GB — excellent. No multitasking bottleneck.\n';
+
+  if(cache<=4) verdict+='ℹ Cache: '+cache+'MB — average. CPU will hit RAM more often.\n';
+  else verdict+='✓ Cache: '+cache+'MB — large cache reduces RAM accesses significantly.\n';
+
+  if(stor===0) verdict+='⚠ Storage: Tape is archival only — not suitable for OS/programs.\n';
+  else if(stor===1) verdict+='ℹ Storage: HDD is fine but boot times will be slow.\n';
+  else if(stor===2) verdict+='✓ Storage: SSD gives fast boot times and file access.\n';
+  else verdict+='✓ Storage: NVMe SSD — fastest consumer storage available.\n';
+
+  document.getElementById('calc-verdict').textContent=verdict;
+}
+updateCalc();
+
+// PAST PAPERS
+function togglePP(btn){btn.nextElementSibling.classList.toggle('open');}
+
+// QUIZ
+let cur=0,score=0,answered=Array(10).fill(false);
+
+function pick(btn,correct,msg){
+  if(answered[cur])return;
+  answered[cur]=true;
+  btn.closest('.opts').querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  const fb=document.getElementById('f'+cur);
+  fb.classList.add('show');
+  if(correct){
+    btn.classList.add('correct');score++;
+    fb.className='q-fb show good';
+    fb.innerHTML='<strong>✓ Correct</strong>'+msg;
+  }else{
+    btn.classList.add('wrong');
+    fb.className='q-fb show bad';
+    fb.innerHTML='<strong>✗ Wrong</strong>'+msg;
+    btn.closest('.opts').querySelectorAll('.opt').forEach(b=>{if(b.onclick.toString().includes(',true,'))b.classList.add('correct');});
+  }
+  document.getElementById('qnext').disabled=false;
+  updateQ();
+}
+
+function updateQ(){
+  document.getElementById('qn').textContent=cur+1;
+  const pct=answered.filter(Boolean).length/10*100;
+  document.getElementById('qf').style.width=pct+'%';
+  document.getElementById('qnext').textContent=(cur===9&&answered[cur])?'RESULTS →':'NEXT →';
+}
+
+function nextQ(){
+  if(cur<9){
+    document.querySelectorAll('.qb')[cur].classList.remove('active');
+    cur++;
+    document.querySelectorAll('.qb')[cur].classList.add('active');
+    document.getElementById('qprev').disabled=false;
+    document.getElementById('qnext').disabled=!answered[cur];
+    updateQ();
+  }else{showScore();}
+}
+
+function prevQ(){
+  if(cur>0){
+    document.querySelectorAll('.qb')[cur].classList.remove('active');
+    cur--;
+    document.querySelectorAll('.qb')[cur].classList.add('active');
+    document.getElementById('qprev').disabled=cur===0;
+    document.getElementById('qnext').disabled=!answered[cur];
+    updateQ();
+  }
+}
+
+function showScore(){
+  document.querySelectorAll('.qb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('qfoot').style.display='none';
+  const s=document.getElementById('scr');s.classList.add('show');
+  document.getElementById('sc-n').textContent=score;
+  const p=score/10*100;
+  document.getElementById('sc-v').textContent=p>=80?'Memory mastered. Solid.':p>=60?'Decent — a few gaps.':'Back to §02–§04.';
+  document.getElementById('sc-a').textContent=p>=80?'Move to next topic.':p>=60?'Review wrong answers and retry.':'Re-read the RAM/ROM sections carefully.';
+  document.getElementById('qf').style.width='100%';
+}
+
+function resetQ(){
+  cur=0;score=0;answered=Array(10).fill(false);
+  document.querySelectorAll('.qb').forEach((b,i)=>{
+    b.classList.toggle('active',i===0);
+    b.querySelectorAll('.opt').forEach(o=>{o.disabled=false;o.classList.remove('correct','wrong');});
+    const f=document.getElementById('f'+i);
+    if(f){f.className='q-fb';f.innerHTML='';}
+  });
+  document.getElementById('scr').classList.remove('show');
+  document.getElementById('qfoot').style.display='flex';
+  document.getElementById('qprev').disabled=true;
+  document.getElementById('qnext').disabled=true;
+  document.getElementById('qnext').textContent='NEXT →';
+  document.getElementById('qf').style.width='0%';
+  document.getElementById('qn').textContent='1';
+}
+</script>
+</body>
+</html>
