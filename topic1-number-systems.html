@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Number Systems — CSC 2101</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* ── DESIGN DIRECTION: Retro-calculator / binary terminal
+   Black & yellow. IBM Plex fonts. Grid lines.
+   Feels like programming a TI calculator, not a website.
+   Every section = different accent color zone.
+─────────────────────────────────────────────── */
+:root {
+  --black: #0a0a0a;
+  --dark: #111111;
+  --dark2: #1a1a1a;
+  --dark3: #222222;
+  --border: #2a2a2a;
+  --text: #e8e8e8;
+  --muted: #666666;
+  --yellow: #ffd700;
+  --yellow2: #ffec6e;
+  --orange: #ff8c00;
+  --green: #39ff14;
+  --cyan: #00e5ff;
+  --red: #ff3355;
+  --purple: #bb86fc;
+
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-sans: 'IBM Plex Sans', sans-serif;
+  --font-serif: 'IBM Plex Serif', serif;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--black);
+  color: var(--text);
+  line-height: 1.65;
+  overflow-x: hidden;
+}
+
+/* ── SCANLINE EFFECT ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* ── NAV ── */
+nav {
+  background: var(--yellow);
+  padding: 0 2rem;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-back {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--black);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.nav-back:hover { opacity: 0.65; }
+
+.nav-path {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: rgba(0,0,0,0.5);
+  letter-spacing: 0.05em;
+}
+
+.nav-sections {
+  margin-left: auto;
+  display: flex;
+  gap: 0.2rem;
+  list-style: none;
+}
+
+.nav-sections a {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: rgba(0,0,0,0.55);
+  text-decoration: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 2px;
+  letter-spacing: 0.04em;
+  transition: all 0.15s;
+}
+.nav-sections a:hover {
+  background: rgba(0,0,0,0.12);
+  color: var(--black);
+}
+
+/* ── HERO ── */
+.hero {
+  background: var(--black);
+  border-bottom: 3px solid var(--yellow);
+  padding: 4rem 2rem 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Binary rain bg */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+.bin-col {
+  position: absolute;
+  top: 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: rgba(255,215,0,0.04);
+  line-height: 1.4;
+  pointer-events: none;
+  animation: fall linear infinite;
+  white-space: pre;
+}
+
+@keyframes fall {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(100vh); }
+}
+
+.hero-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--yellow);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(255,215,0,0.25);
+  padding: 0.4rem 0.9rem;
+  border-radius: 2px;
+  background: rgba(255,215,0,0.04);
+}
+
+.hero-badge::before {
+  content: '▶';
+  font-size: 0.6rem;
+}
+
+.hero h1 {
+  font-family: var(--font-mono);
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 600;
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+  color: white;
+  letter-spacing: -0.02em;
+}
+
+.hero h1 .hl { color: var(--yellow); }
+
+.hero-sub {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 2rem;
+  letter-spacing: 0.05em;
+}
+
+.hero-sub .hl { color: var(--yellow); }
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 3rem;
+}
+
+.htag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid;
+  border-radius: 1px;
+}
+
+.htag-y { color: var(--yellow); border-color: rgba(255,215,0,0.3); }
+.htag-g { color: var(--green); border-color: rgba(57,255,20,0.25); }
+.htag-c { color: var(--cyan); border-color: rgba(0,229,255,0.25); }
+.htag-r { color: var(--red); border-color: rgba(255,51,85,0.3); }
+
+/* Binary display */
+.hero-binary {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: rgba(255,215,0,0.3);
+  letter-spacing: 0.2em;
+  margin-bottom: 2.5rem;
+  overflow: hidden;
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.hstat {
+  padding: 1.2rem;
+  border-right: 1px solid var(--border);
+  text-align: center;
+}
+.hstat:last-child { border-right: none; }
+
+.hstat-n {
+  font-family: var(--font-mono);
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--yellow);
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.hstat-l {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ── CONTENT ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 6rem;
+}
+
+/* ── SECTION ── */
+.sec {
+  margin-top: 5rem;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s, transform 0.5s;
+}
+.sec.visible { opacity: 1; transform: translateY(0); }
+
+.sec-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.sec-title {
+  font-family: var(--font-mono);
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.3rem;
+  letter-spacing: -0.02em;
+}
+
+.sec-title .acc { color: var(--yellow); }
+
+.sec-rule {
+  height: 1px;
+  background: linear-gradient(90deg, var(--yellow), transparent);
+  border: none;
+  margin-bottom: 2rem;
+}
+
+/* ── SYSTEM INTRO CARDS ── */
+.sys-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.sys-card {
+  background: var(--dark);
+  padding: 1.8rem 1.5rem;
+  transition: background 0.2s;
+}
+.sys-card:hover { background: var(--dark2); }
+
+.sys-card-top {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.sys-num {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.sys-base {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.sys-name {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.sys-digits {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  margin-bottom: 0.5rem;
+}
+
+.sys-desc { font-size: 0.83rem; color: #aaa; line-height: 1.6; }
+
+/* ── CONVERSION TABLE ── */
+.conv-table-wrap {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border: 1px solid var(--border);
+}
+
+.conv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.conv-table thead tr {
+  background: var(--yellow);
+}
+
+.conv-table th {
+  padding: 0.8rem 1.2rem;
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--black);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.conv-table td {
+  padding: 0.6rem 1.2rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  color: #ccc;
+  background: var(--dark);
+}
+
+.conv-table tr:hover td { background: var(--dark2); color: white; }
+.conv-table td:first-child { color: var(--yellow); font-weight: 600; }
+.conv-table td:nth-child(2) { color: var(--green); }
+.conv-table td:nth-child(3) { color: var(--cyan); }
+
+/* ── CALLOUTS ── */
+.callout {
+  padding: 1.1rem 1.4rem;
+  border-left: 3px solid;
+  margin: 1.5rem 0;
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+.callout strong {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.callout-y { background: rgba(255,215,0,0.05); border-color: var(--yellow); color: #e8d57a; }
+.callout-y strong { color: var(--yellow); }
+.callout-g { background: rgba(57,255,20,0.04); border-color: var(--green); color: #a8e888; }
+.callout-g strong { color: var(--green); }
+.callout-r { background: rgba(255,51,85,0.05); border-color: var(--red); color: #ffaaaa; }
+.callout-r strong { color: var(--red); }
+.callout-c { background: rgba(0,229,255,0.04); border-color: var(--cyan); color: #a0e8f0; }
+.callout-c strong { color: var(--cyan); }
+
+/* ── STEP-BY-STEP CONVERTER ── */
+.step-box {
+  background: var(--dark);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 1.5rem 0;
+}
+
+.step-header {
+  background: var(--dark2);
+  padding: 0.9rem 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.step-title {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--yellow);
+}
+
+.step-badge {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  background: rgba(255,215,0,0.1);
+  color: var(--yellow);
+  border: 1px solid rgba(255,215,0,0.2);
+}
+
+.steps {
+  padding: 1.4rem;
+}
+
+.step-row {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  gap: 1rem;
+  align-items: start;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.step-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.step-n {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(255,215,0,0.1);
+  border: 1px solid rgba(255,215,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--yellow);
+  flex-shrink: 0;
+}
+
+.step-text { font-size: 0.87rem; color: #ccc; line-height: 1.7; }
+.step-text strong { color: white; font-family: var(--font-mono); }
+.step-text code {
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  padding: 0.1rem 0.5rem;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--yellow2);
+}
+
+.step-result {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--green);
+  white-space: nowrap;
+}
+
+/* ── DIVISION TABLE ── */
+.div-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  margin: 1rem 0;
+  border: 1px solid var(--border);
+}
+
+.div-table th {
+  background: var(--dark2);
+  color: var(--yellow);
+  padding: 0.6rem 1rem;
+  text-align: center;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.div-table td {
+  padding: 0.55rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  color: #ccc;
+  background: var(--dark);
+}
+
+.div-table tr:hover td { background: var(--dark2); }
+.div-table .result-row td { color: var(--green); background: rgba(57,255,20,0.04); border-top: 1px solid rgba(57,255,20,0.2); }
+
+/* ── INTERACTIVE CONVERTER ── */
+.converter {
+  background: var(--dark);
+  border: 2px solid var(--yellow);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 1.5rem 0;
+}
+
+.conv-header {
+  background: var(--yellow);
+  padding: 0.8rem 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.conv-header-title {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--black);
+  letter-spacing: 0.05em;
+}
+
+.conv-header-sub {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: rgba(0,0,0,0.55);
+}
+
+.conv-body { padding: 1.5rem; }
+
+.conv-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 1rem;
+  align-items: end;
+  margin-bottom: 1.2rem;
+}
+
+.conv-field label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.conv-field input, .conv-field select {
+  width: 100%;
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 0.7rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--yellow);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.conv-field input:focus, .conv-field select:focus {
+  border-color: var(--yellow);
+}
+
+.conv-field select option { background: var(--dark2); color: var(--text); }
+
+.conv-arrow {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  color: var(--yellow);
+  padding-bottom: 0.6rem;
+  text-align: center;
+}
+
+.conv-result {
+  background: var(--dark2);
+  border: 1px solid rgba(57,255,20,0.3);
+  border-radius: 2px;
+  padding: 1rem 1.2rem;
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
+  color: var(--green);
+  letter-spacing: 0.1em;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+}
+
+.conv-steps-out {
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 1rem 1.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #999;
+  white-space: pre-wrap;
+  line-height: 1.9;
+  margin-top: 0.8rem;
+  min-height: 60px;
+}
+
+.conv-btn {
+  width: 100%;
+  background: var(--yellow);
+  color: var(--black);
+  border: none;
+  padding: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 2px;
+  margin-top: 1rem;
+  transition: background 0.15s;
+}
+.conv-btn:hover { background: var(--yellow2); }
+
+/* ── ARITHMETIC SECTION ── */
+.arith-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin: 1.5rem 0;
+}
+
+.arith-card { background: var(--dark); padding: 1.5rem; }
+
+.arith-title {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 1rem;
+}
+
+.arith-problem {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: white;
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  padding: 1rem;
+  margin-bottom: 0.8rem;
+  border-radius: 2px;
+}
+
+.arith-line { display: flex; justify-content: flex-end; gap: 0.5rem; }
+.arith-op { color: var(--yellow); }
+.arith-num { letter-spacing: 0.1em; }
+.arith-bar { border-top: 1px solid #555; margin: 0.3rem 0; }
+.arith-result { color: var(--green); font-weight: 600; }
+
+.arith-note {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.carry-row {
+  font-size: 0.72rem;
+  color: var(--cyan);
+}
+
+/* ── PAST PAPER ── */
+.pp-list { display: flex; flex-direction: column; gap: 1rem; }
+
+.pp-item {
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.pp-trigger {
+  width: 100%;
+  background: var(--dark2);
+  border: none;
+  padding: 1rem 1.2rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-sans);
+  transition: background 0.15s;
+}
+
+.pp-trigger:hover { background: var(--dark3); }
+
+.pp-yr {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  background: var(--yellow);
+  color: var(--black);
+  padding: 0.2rem 0.6rem;
+  border-radius: 1px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.pp-q { font-size: 0.9rem; font-weight: 500; color: var(--text); line-height: 1.5; flex: 1; }
+
+.pp-pts {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--red);
+  border: 1px solid rgba(255,51,85,0.3);
+  padding: 0.2rem 0.6rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.pp-body {
+  display: none;
+  padding: 1.4rem;
+  background: var(--dark);
+  border-top: 1px solid var(--border);
+  font-size: 0.87rem;
+  line-height: 1.8;
+  color: #bbb;
+}
+
+.pp-body.open { display: block; }
+
+.model-ans {
+  background: var(--dark2);
+  border: 1px solid rgba(57,255,20,0.2);
+  padding: 1.2rem;
+  margin-top: 0.8rem;
+}
+
+.model-lbl {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--green);
+  margin-bottom: 0.8rem;
+  font-weight: 600;
+}
+
+.model-ans ul { padding-left: 1.2rem; }
+.model-ans li { margin-bottom: 0.5rem; }
+.model-ans code {
+  background: var(--dark);
+  padding: 0.1rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--yellow2);
+  border: 1px solid var(--border);
+}
+
+/* ── QUIZ ── */
+.quiz {
+  background: var(--dark);
+  border: 2px solid var(--yellow);
+  overflow: hidden;
+}
+
+.quiz-top {
+  background: var(--yellow);
+  padding: 1.4rem 1.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.quiz-top-l h3 {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--black);
+  letter-spacing: -0.01em;
+}
+
+.quiz-top-l p {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: rgba(0,0,0,0.5);
+  margin-top: 0.2rem;
+  letter-spacing: 0.05em;
+}
+
+.quiz-counter {
+  font-family: var(--font-mono);
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--black);
+  line-height: 1;
+}
+.quiz-counter span { font-size: 0.9rem; opacity: 0.4; }
+
+.quiz-prog {
+  height: 4px;
+  background: rgba(0,0,0,0.15);
+}
+.quiz-fill {
+  height: 100%;
+  background: var(--black);
+  transition: width 0.4s;
+  width: 0%;
+}
+
+.quiz-inner { padding: 2rem; }
+
+.qb { display: none; }
+.qb.active { display: block; }
+
+.q-src {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--orange);
+  margin-bottom: 0.8rem;
+}
+
+.q-txt {
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 1.8rem;
+  line-height: 1.6;
+  font-family: var(--font-mono);
+}
+
+.opts { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
+
+.opt {
+  background: var(--dark2);
+  border: 1.5px solid var(--border);
+  padding: 0.85rem 1.1rem;
+  color: #bbb;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  transition: all 0.15s;
+}
+
+.opt:hover:not(:disabled) {
+  border-color: var(--yellow);
+  color: white;
+  background: rgba(255,215,0,0.05);
+}
+
+.opt-k {
+  font-size: 0.72rem;
+  font-weight: 700;
+  width: 24px; height: 24px;
+  border: 1px solid var(--muted);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.opt:hover:not(:disabled) .opt-k { border-color: var(--yellow); color: var(--yellow); }
+.opt.correct { border-color: var(--green); color: var(--green); background: rgba(57,255,20,0.05); }
+.opt.correct .opt-k { background: var(--green); color: var(--black); border-color: var(--green); }
+.opt.wrong { border-color: var(--red); color: #ff9999; background: rgba(255,51,85,0.05); }
+.opt.wrong .opt-k { background: var(--red); color: white; border-color: var(--red); }
+.opt:disabled { cursor: default; }
+
+.q-fb {
+  display: none;
+  padding: 0.9rem 1.1rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+  border: 1px solid;
+}
+.q-fb.show { display: block; }
+.q-fb.good { border-color: rgba(57,255,20,0.3); background: rgba(57,255,20,0.05); color: #88ee88; }
+.q-fb.bad  { border-color: rgba(255,51,85,0.3);  background: rgba(255,51,85,0.05);  color: #ff9999; }
+.q-fb strong { display: block; margin-bottom: 0.3rem; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; }
+
+.quiz-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--border);
+}
+
+.qbtn {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.65rem 1.4rem;
+  cursor: pointer;
+  border: none;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transition: all 0.15s;
+}
+.qbtn-p { background: var(--yellow); color: var(--black); }
+.qbtn-p:hover { background: var(--yellow2); }
+.qbtn-p:disabled { opacity: 0.3; cursor: default; }
+.qbtn-g { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+.qbtn-g:hover { color: var(--text); border-color: var(--muted); }
+.qbtn-g:disabled { opacity: 0.3; cursor: default; }
+
+/* Score */
+.score-scr { display: none; text-align: center; padding: 3rem 2rem; }
+.score-scr.show { display: block; }
+.score-box {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 120px; height: 120px;
+  border: 2px solid var(--yellow);
+  background: rgba(255,215,0,0.04);
+  margin: 0 auto 1.5rem;
+}
+.score-big { font-family: var(--font-mono); font-size: 2.8rem; font-weight: 600; color: var(--yellow); line-height: 1; }
+.score-den { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); }
+.score-v { font-family: var(--font-mono); font-size: 1rem; font-weight: 600; color: white; margin-bottom: 0.5rem; }
+.score-a { font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem; font-family: var(--font-mono); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--yellow);
+  padding: 1.4rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: rgba(0,0,0,0.6);
+  font-weight: 600;
+}
+footer a { color: var(--black); text-decoration: none; letter-spacing: 0.04em; }
+footer a:hover { opacity: 0.6; }
+
+/* ── MOBILE ── */
+@media (max-width: 700px) {
+  .hero h1 { font-size: 2.2rem; }
+  .hero-stats { grid-template-columns: repeat(2, 1fr); }
+  nav .nav-sections { display: none; }
+  .sys-grid { grid-template-columns: 1fr; }
+  .arith-grid { grid-template-columns: 1fr; }
+  .conv-row { grid-template-columns: 1fr; }
+  .conv-arrow { display: none; }
+  .content { padding: 0 1.2rem 4rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="CSC2101_index.html" class="nav-back">← home</a>
+  <span class="nav-path">csc2101 / topic-01 / number-systems</span>
+  <ul class="nav-sections">
+    <li><a href="#systems">§01</a></li>
+    <li><a href="#conversions">§02</a></li>
+    <li><a href="#hex">§03</a></li>
+    <li><a href="#arithmetic">§04</a></li>
+    <li><a href="#tool">§05</a></li>
+    <li><a href="#past">§06</a></li>
+    <li><a href="#quiz">§07</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-bg" id="hero-bg"></div>
+  <div class="hero-inner">
+    <div class="hero-badge">Topic 01 · CSC 2101 Computer Systems</div>
+    <h1>Number<br><span class="hl">Systems</span></h1>
+    <p class="hero-sub">// Binary · Decimal · Hexadecimal · <span class="hl">Appears in EVERY exam.</span></p>
+    <div class="hero-binary" id="hero-bin">01000011 01010011 01000011 00100000 00110010 00110001 00110000 00110001</div>
+    <div class="hero-tags">
+      <span class="htag htag-r">Every Exam · 2015→2025</span>
+      <span class="htag htag-y">Base-2 Binary</span>
+      <span class="htag htag-g">Base-10 Decimal</span>
+      <span class="htag htag-c">Base-16 Hexadecimal</span>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><div class="hstat-n">3</div><div class="hstat-l">Number Systems</div></div>
+      <div class="hstat"><div class="hstat-n">12</div><div class="hstat-l">Past Questions</div></div>
+      <div class="hstat"><div class="hstat-n">5+</div><div class="hstat-l">Exam Years</div></div>
+      <div class="hstat"><div class="hstat-n">10</div><div class="hstat-l">Quiz Questions</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="content">
+
+  <!-- §01 THE THREE SYSTEMS -->
+  <section id="systems" class="sec">
+    <p class="sec-label">§ 01</p>
+    <h2 class="sec-title">The <span class="acc">Three</span> Number Systems</h2>
+    <hr class="sec-rule">
+
+    <div class="callout callout-r">
+      <strong>⚠ Exam Alert — 2015, 2019, 2024, 2025</strong>
+      Number conversions appear in literally every exam paper collected. If you can't convert between Binary, Decimal, and Hex in your sleep, you're leaving marks on the table.
+    </div>
+
+    <div class="sys-grid">
+      <div class="sys-card">
+        <div class="sys-card-top">
+          <div class="sys-num" style="color:var(--green)">2</div>
+          <div>
+            <div class="sys-name" style="color:var(--green)">Binary</div>
+            <div class="sys-base">Base-2</div>
+          </div>
+        </div>
+        <div class="sys-digits" style="color:var(--green)">Digits: <strong>0, 1</strong></div>
+        <div class="sys-desc">Used internally by ALL computers. Every file, image, and instruction is stored as a sequence of 0s and 1s. Each digit is called a <strong>bit</strong>. 8 bits = 1 byte.</div>
+      </div>
+      <div class="sys-card">
+        <div class="sys-card-top">
+          <div class="sys-num" style="color:var(--yellow)">10</div>
+          <div>
+            <div class="sys-name" style="color:var(--yellow)">Decimal</div>
+            <div class="sys-base">Base-10</div>
+          </div>
+        </div>
+        <div class="sys-digits" style="color:var(--yellow)">Digits: <strong>0–9</strong></div>
+        <div class="sys-desc">The number system humans use every day. Each position represents a power of 10 (1s, 10s, 100s, 1000s...). The most intuitive system for people.</div>
+      </div>
+      <div class="sys-card">
+        <div class="sys-card-top">
+          <div class="sys-num" style="color:var(--cyan)">16</div>
+          <div>
+            <div class="sys-name" style="color:var(--cyan)">Hexadecimal</div>
+            <div class="sys-base">Base-16</div>
+          </div>
+        </div>
+        <div class="sys-digits" style="color:var(--cyan)">Digits: <strong>0–9, A–F</strong></div>
+        <div class="sys-desc">Used in programming, memory addresses, and color codes (#FF5733). A=10, B=11, C=12, D=13, E=14, F=15. 1 hex digit = 4 binary bits.</div>
+      </div>
+    </div>
+
+    <h3 style="font-family:var(--font-mono);font-size:1rem;color:white;margin-bottom:1rem;margin-top:1.5rem">Quick Reference Table</h3>
+    <div class="conv-table-wrap">
+      <table class="conv-table">
+        <thead>
+          <tr>
+            <th>Decimal</th>
+            <th>Binary</th>
+            <th>Hexadecimal</th>
+          </tr>
+        </thead>
+        <tbody id="ref-table"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- §02 DECIMAL ↔ BINARY -->
+  <section id="conversions" class="sec">
+    <p class="sec-label">§ 02</p>
+    <h2 class="sec-title">Decimal <span class="acc">↔</span> Binary</h2>
+    <hr class="sec-rule">
+
+    <div class="callout callout-y">
+      <strong>Exam Question — 2024 Q1c</strong>
+      "Convert 30₁₀ to binary (show your working)" — 2 marks for the working, 1 for the answer. Always show the division table.
+    </div>
+
+    <!-- Decimal to Binary -->
+    <div class="step-box">
+      <div class="step-header">
+        <span class="step-title">Method: Decimal → Binary (Repeated Division by 2)</span>
+        <span class="step-badge">2024 Exam Example</span>
+      </div>
+      <div class="steps">
+        <p style="font-family:var(--font-mono);font-size:0.9rem;color:white;margin-bottom:1.2rem">
+          Example: Convert <strong style="color:var(--yellow)">30₁₀</strong> to binary
+        </p>
+
+        <div class="div-table-wrap" style="overflow-x:auto;margin-bottom:1rem">
+          <table class="div-table">
+            <thead><tr><th>Step</th><th>Divide by 2</th><th>Quotient</th><th>Remainder (bit)</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>30 ÷ 2</td><td>15</td><td style="color:var(--yellow)">0 (LSB)</td></tr>
+              <tr><td>2</td><td>15 ÷ 2</td><td>7</td><td style="color:var(--yellow)">1</td></tr>
+              <tr><td>3</td><td>7 ÷ 2</td><td>3</td><td style="color:var(--yellow)">1</td></tr>
+              <tr><td>4</td><td>3 ÷ 2</td><td>1</td><td style="color:var(--yellow)">1</td></tr>
+              <tr><td>5</td><td>1 ÷ 2</td><td>0</td><td style="color:var(--yellow)">1 (MSB)</td></tr>
+              <tr class="result-row"><td colspan="3">Read remainders bottom to top →</td><td>11110₂</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-g" style="margin-top:0">
+          <strong>Answer</strong>
+          30₁₀ = <strong>11110₂</strong> · Always read the remainders from BOTTOM to TOP (MSB to LSB).
+        </div>
+      </div>
+    </div>
+
+    <!-- Binary to Decimal -->
+    <div class="step-box" style="margin-top:1.5rem">
+      <div class="step-header">
+        <span class="step-title">Method: Binary → Decimal (Positional Weights)</span>
+        <span class="step-badge">2025 & 2019 Exam</span>
+      </div>
+      <div class="steps">
+        <p style="font-family:var(--font-mono);font-size:0.9rem;color:white;margin-bottom:1.2rem">
+          Example: Convert <strong style="color:var(--green)">1101101₂</strong> to decimal (2025 Exam Q1a)
+        </p>
+
+        <div class="step-row">
+          <div class="step-n">1</div>
+          <div class="step-text">Write out each bit and its positional weight (powers of 2 from right to left: 2⁰, 2¹, 2², etc.)</div>
+          <div></div>
+        </div>
+
+        <div style="overflow-x:auto;margin-bottom:1rem">
+          <table class="div-table">
+            <thead><tr><th>Bit position</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th></tr></thead>
+            <tbody>
+              <tr><td>Bit value</td><td style="color:var(--yellow)">1</td><td style="color:var(--yellow)">1</td><td style="color:var(--yellow)">0</td><td style="color:var(--yellow)">1</td><td style="color:var(--yellow)">1</td><td style="color:var(--yellow)">0</td><td style="color:var(--yellow)">1</td></tr>
+              <tr><td>Weight (2ⁿ)</td><td>64</td><td>32</td><td>16</td><td>8</td><td>4</td><td>2</td><td>1</td></tr>
+              <tr><td>Contribution</td><td style="color:var(--green)">64</td><td style="color:var(--green)">32</td><td style="color:var(--muted)">0</td><td style="color:var(--green)">8</td><td style="color:var(--green)">4</td><td style="color:var(--muted)">0</td><td style="color:var(--green)">1</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="step-row">
+          <div class="step-n">2</div>
+          <div class="step-text">Add up all contributions where bit = 1: <strong>64 + 32 + 8 + 4 + 1 = 109</strong></div>
+          <div class="step-result">= 109₁₀</div>
+        </div>
+
+        <div class="callout callout-g" style="margin-top:0">
+          <strong>Answer</strong>
+          1101101₂ = <strong>109₁₀</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-c">
+      <strong>Also from 2025 exam — Convert 156₁₀ to binary</strong>
+      Try it yourself using the division table method. Answer: <strong>10011100₂</strong>
+      Working: 156÷2=78 r0 → 78÷2=39 r0 → 39÷2=19 r1 → 19÷2=9 r1 → 9÷2=4 r1 → 4÷2=2 r0 → 2÷2=1 r0 → 1÷2=0 r1. Read bottom to top: 10011100.
+    </div>
+  </section>
+
+  <!-- §03 HEXADECIMAL -->
+  <section id="hex" class="sec">
+    <p class="sec-label">§ 03</p>
+    <h2 class="sec-title">Hexadecimal <span class="acc">↔</span> Decimal</h2>
+    <hr class="sec-rule">
+
+    <div class="callout callout-r">
+      <strong>Exam Question — 2025 Q1a</strong>
+      "Convert 3A₁₆ to decimal" — 2 marks. Know your A=10, B=11...F=15.
+    </div>
+
+    <!-- Hex to Decimal -->
+    <div class="step-box">
+      <div class="step-header">
+        <span class="step-title">Method: Hex → Decimal</span>
+        <span class="step-badge">2025 Exam</span>
+      </div>
+      <div class="steps">
+        <p style="font-family:var(--font-mono);font-size:0.9rem;color:white;margin-bottom:1.2rem">
+          Example: Convert <strong style="color:var(--cyan)">3A₁₆</strong> to decimal
+        </p>
+
+        <div class="step-row">
+          <div class="step-n">1</div>
+          <div class="step-text">Write each hex digit and its positional weight (powers of 16 right to left)</div>
+          <div></div>
+        </div>
+        <div class="step-row">
+          <div class="step-n">2</div>
+          <div class="step-text">3 is in position 1 (16¹ = 16), A is in position 0 (16⁰ = 1). Remember A = 10.</div>
+          <div></div>
+        </div>
+        <div class="step-row">
+          <div class="step-n">3</div>
+          <div class="step-text">Multiply each digit by its weight: <strong>(3 × 16) + (10 × 1) = 48 + 10 = 58</strong></div>
+          <div class="step-result">= 58₁₀</div>
+        </div>
+
+        <div class="callout callout-g" style="margin-top:0">
+          <strong>Answer</strong>
+          3A₁₆ = <strong>58₁₀</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hex reference -->
+    <h3 style="font-family:var(--font-mono);font-size:0.9rem;color:var(--cyan);margin:1.5rem 0 0.8rem;text-transform:uppercase;letter-spacing:0.1em">Hex Digit Reference</h3>
+    <div class="conv-table-wrap">
+      <table class="conv-table">
+        <thead>
+          <tr><th>Decimal</th><th>Hex</th><th>Binary (4-bit)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>10</td><td style="color:var(--cyan)">A</td><td style="color:var(--green)">1010</td></tr>
+          <tr><td>11</td><td style="color:var(--cyan)">B</td><td style="color:var(--green)">1011</td></tr>
+          <tr><td>12</td><td style="color:var(--cyan)">C</td><td style="color:var(--green)">1100</td></tr>
+          <tr><td>13</td><td style="color:var(--cyan)">D</td><td style="color:var(--green)">1101</td></tr>
+          <tr><td>14</td><td style="color:var(--cyan)">E</td><td style="color:var(--green)">1110</td></tr>
+          <tr><td>15</td><td style="color:var(--cyan)">F</td><td style="color:var(--green)">1111</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-c">
+      <strong>Shortcut — Hex ↔ Binary</strong>
+      1 hex digit = exactly 4 binary bits. So 3A₁₆ = 0011 1010₂. Split the hex into digits, convert each to 4-bit binary. This is why programmers love hex — it's compact binary.
+    </div>
+  </section>
+
+  <!-- §04 BINARY ARITHMETIC -->
+  <section id="arithmetic" class="sec">
+    <p class="sec-label">§ 04</p>
+    <h2 class="sec-title">Binary <span class="acc">Arithmetic</span></h2>
+    <hr class="sec-rule">
+
+    <div class="callout callout-r">
+      <strong>Exam Question — 2024 Q1c (13 marks!)</strong>
+      All four operations came up: addition, subtraction, multiplication, division. 13 marks just for binary arithmetic. Practise these until it's automatic.
+    </div>
+
+    <div class="arith-grid">
+      <!-- ADDITION -->
+      <div class="arith-card">
+        <div class="arith-title" style="color:var(--green)">▶ Addition — 1011 + 1101</div>
+        <div class="arith-problem">
+          <div class="arith-line carry-row"><span style="margin-right:2.3rem">Carry:</span><span>1 1 1</span></div>
+          <div class="arith-line"><span style="opacity:0;margin-right:0.5rem">+</span><span class="arith-num">1011</span></div>
+          <div class="arith-line"><span class="arith-op">+</span><span class="arith-num">1101</span></div>
+          <div class="arith-bar"></div>
+          <div class="arith-line"><span style="opacity:0;margin-right:0.5rem">+</span><span class="arith-num arith-result">11000</span></div>
+        </div>
+        <div class="arith-note">
+          Rules: 0+0=0 · 0+1=1 · 1+0=1 · 1+1=10 (write 0, carry 1) · 1+1+1=11 (write 1, carry 1)
+        </div>
+      </div>
+
+      <!-- SUBTRACTION -->
+      <div class="arith-card">
+        <div class="arith-title" style="color:var(--cyan)">▶ Subtraction — 1101 - 1011</div>
+        <div class="arith-problem">
+          <div class="arith-line carry-row"><span style="margin-right:1.8rem">Borrow:</span><span>1</span></div>
+          <div class="arith-line"><span style="opacity:0;margin-right:0.5rem">-</span><span class="arith-num">1101</span></div>
+          <div class="arith-line"><span class="arith-op">-</span><span class="arith-num">1011</span></div>
+          <div class="arith-bar"></div>
+          <div class="arith-line"><span style="opacity:0;margin-right:0.5rem">-</span><span class="arith-num arith-result">0010</span></div>
+        </div>
+        <div class="arith-note">
+          Rules: 0-0=0 · 1-0=1 · 1-1=0 · 0-1 → borrow: 10-1=1, mark borrow from next column.
+        </div>
+      </div>
+
+      <!-- MULTIPLICATION -->
+      <div class="arith-card">
+        <div class="arith-title" style="color:var(--yellow)">▶ Multiplication — 1001 × 111</div>
+        <div class="arith-problem" style="font-size:0.88rem">
+          <div class="arith-line"><span style="opacity:0;margin-right:0.5rem">×</span><span class="arith-num">1001</span></div>
+          <div class="arith-line"><span class="arith-op">×</span><span class="arith-num">111</span></div>
+          <div class="arith-bar"></div>
+          <div class="arith-line carry-row"><span style="opacity:0;margin-right:0.5rem"> </span><span>1001</span><span style="margin-left:0.3rem;opacity:0.5">(×1)</span></div>
+          <div class="arith-line carry-row"><span style="opacity:0;margin-right:0.5rem"> </span><span>10010</span><span style="margin-left:0.3rem;opacity:0.5">(×10)</span></div>
+          <div class="arith-line carry-row"><span style="opacity:0;margin-right:0.5rem"> </span><span>100100</span><span style="margin-left:0.3rem;opacity:0.5">(×100)</span></div>
+          <div class="arith-bar"></div>
+          <div class="arith-line"><span style="opacity:0;margin-right:0.5rem"> </span><span class="arith-num arith-result">111111</span></div>
+        </div>
+        <div class="arith-note">
+          Like long multiplication: shift left each partial product. Add all partial products.
+        </div>
+      </div>
+
+      <!-- DIVISION -->
+      <div class="arith-card">
+        <div class="arith-title" style="color:var(--purple)">▶ Division — 10101 ÷ 11</div>
+        <div class="arith-problem" style="font-size:0.88rem">
+          <div style="color:var(--purple);margin-bottom:0.5rem">10101 ÷ 11 = ?</div>
+          <div class="arith-line carry-row">11 goes into 10: NO (0)</div>
+          <div class="arith-line carry-row">11 goes into 101: YES, once (1), rem 10</div>
+          <div class="arith-line carry-row">Bring down 0 → 100</div>
+          <div class="arith-line carry-row">11 goes into 100: YES, once (1), rem 1</div>
+          <div class="arith-line carry-row">Bring down 1 → 11</div>
+          <div class="arith-line carry-row">11 goes into 11: YES, once (1), rem 0</div>
+          <div class="arith-bar"></div>
+          <div class="arith-line"><span class="arith-num arith-result">111₂ = 7₁₀</span></div>
+        </div>
+        <div class="arith-note">
+          Binary long division works like decimal long division — just with 0s and 1s.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §05 INTERACTIVE TOOL -->
+  <section id="tool" class="sec">
+    <p class="sec-label">§ 05</p>
+    <h2 class="sec-title"><span class="acc">Interactive</span> Converter</h2>
+    <hr class="sec-rule">
+
+    <p style="color:var(--muted);font-size:0.88rem;font-family:var(--font-mono);margin-bottom:1.5rem">// Type any number and see the conversion + working steps in real time</p>
+
+    <div class="converter">
+      <div class="conv-header">
+        <div class="conv-header-title">NUMBER SYSTEM CONVERTER</div>
+        <div class="conv-header-sub">shows working steps · exam practice</div>
+      </div>
+      <div class="conv-body">
+        <div class="conv-row">
+          <div class="conv-field">
+            <label>Input value</label>
+            <input type="text" id="conv-in" placeholder="e.g. 156" oninput="doConvert()">
+          </div>
+          <div class="conv-arrow">→</div>
+          <div class="conv-field">
+            <label>From base</label>
+            <select id="conv-from" onchange="doConvert()">
+              <option value="10">Decimal (Base 10)</option>
+              <option value="2">Binary (Base 2)</option>
+              <option value="16">Hexadecimal (Base 16)</option>
+            </select>
+          </div>
+        </div>
+        <label style="font-family:var(--font-mono);font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);display:block;margin-bottom:0.4rem">Result</label>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;margin-bottom:0.8rem">
+          <div>
+            <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--muted);margin-bottom:0.3rem;text-transform:uppercase;letter-spacing:0.08em">Binary</div>
+            <div class="conv-result" id="r-bin" style="font-size:0.95rem">—</div>
+          </div>
+          <div>
+            <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--muted);margin-bottom:0.3rem;text-transform:uppercase;letter-spacing:0.08em">Decimal</div>
+            <div class="conv-result" id="r-dec" style="font-size:0.95rem;color:var(--yellow)">—</div>
+          </div>
+          <div>
+            <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--muted);margin-bottom:0.3rem;text-transform:uppercase;letter-spacing:0.08em">Hex</div>
+            <div class="conv-result" id="r-hex" style="font-size:0.95rem;color:var(--cyan)">—</div>
+          </div>
+        </div>
+        <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--muted);margin-bottom:0.3rem;text-transform:uppercase;letter-spacing:0.08em">Working steps</div>
+        <div class="conv-steps-out" id="conv-steps">// Enter a number above to see step-by-step working</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §06 PAST PAPERS -->
+  <section id="past" class="sec">
+    <p class="sec-label">§ 06</p>
+    <h2 class="sec-title">Past Paper <span class="acc">Questions</span></h2>
+    <hr class="sec-rule">
+
+    <p style="color:var(--muted);font-size:0.85rem;font-family:var(--font-mono);margin-bottom:1.5rem">// Try each one before clicking reveal. No cheating.</p>
+
+    <div class="pp-list">
+
+      <div class="pp-item">
+        <button class="pp-trigger" onclick="togglePP(this)">
+          <span class="pp-yr">2025</span>
+          <span class="pp-q">Convert the following: (a) 1101101₂ to decimal (b) 156₁₀ to binary (c) 3A₁₆ to decimal</span>
+          <span class="pp-pts">6 marks</span>
+        </button>
+        <div class="pp-body">
+          <div class="model-ans">
+            <div class="model-lbl">Model Answer</div>
+            <ul>
+              <li><strong>1101101₂ to decimal:</strong> 1×64 + 1×32 + 0×16 + 1×8 + 1×4 + 0×2 + 1×1 = 64+32+8+4+1 = <code>109₁₀</code></li>
+              <li><strong>156₁₀ to binary:</strong> Divide repeatedly by 2 → remainders read bottom to top = <code>10011100₂</code></li>
+              <li><strong>3A₁₆ to decimal:</strong> 3×16 + 10×1 = 48+10 = <code>58₁₀</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pp-item">
+        <button class="pp-trigger" onclick="togglePP(this)">
+          <span class="pp-yr">2024</span>
+          <span class="pp-q">Convert 30₁₀ to binary. Find: (i) 1011+1101 (ii) 1101-1011 (iii) 1001×111 (iv) 10101÷11</span>
+          <span class="pp-pts">13 marks</span>
+        </button>
+        <div class="pp-body">
+          <div class="model-ans">
+            <div class="model-lbl">Model Answer</div>
+            <ul>
+              <li><strong>30₁₀ to binary:</strong> 30→15 r0, 15→7 r1, 7→3 r1, 3→1 r1, 1→0 r1. Answer = <code>11110₂</code></li>
+              <li><strong>1011 + 1101</strong> = <code>11000₂</code> (carries: 1+1=10, carry the 1)</li>
+              <li><strong>1101 - 1011</strong> = <code>0010₂</code></li>
+              <li><strong>1001 × 111</strong> = <code>111111₂</code> (= 63₁₀, verify: 9×7=63 ✓)</li>
+              <li><strong>10101 ÷ 11</strong> = <code>111₂</code> remainder 0 (= 21÷3=7 ✓)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pp-item">
+        <button class="pp-trigger" onclick="togglePP(this)">
+          <span class="pp-yr">2019 CIT</span>
+          <span class="pp-q">Convert: (i) 47.54₁₀ to binary (ii) 1011011₂ to decimal</span>
+          <span class="pp-pts">4 marks</span>
+        </button>
+        <div class="pp-body">
+          <div class="model-ans">
+            <div class="model-lbl">Model Answer</div>
+            <ul>
+              <li><strong>1011011₂ to decimal:</strong> 1×64+0×32+1×16+1×8+0×4+1×2+1×1 = 64+16+8+2+1 = <code>91₁₀</code></li>
+              <li><strong>47.54₁₀ to binary:</strong> Integer part 47: divide by 2 → <code>101111₂</code>. Fractional .54: multiply by 2 repeatedly → .54×2=1.08(1), .08×2=0.16(0), .16×2=0.32(0), .32×2=0.64(0), .64×2=1.28(1)... → <code>0.10001...</code>. Full answer: <code>101111.10001₂</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pp-item">
+        <button class="pp-trigger" onclick="togglePP(this)">
+          <span class="pp-yr">2015</span>
+          <span class="pp-q">What is the 8-bit binary representation of the integer 107?</span>
+          <span class="pp-pts">1 mark</span>
+        </button>
+        <div class="pp-body">
+          <div class="model-ans">
+            <div class="model-lbl">Model Answer</div>
+            <ul>
+              <li>107 ÷ 2 = 53 r<strong>1</strong></li>
+              <li>53 ÷ 2 = 26 r<strong>1</strong></li>
+              <li>26 ÷ 2 = 13 r<strong>0</strong></li>
+              <li>13 ÷ 2 = 6 r<strong>1</strong></li>
+              <li>6 ÷ 2 = 3 r<strong>0</strong></li>
+              <li>3 ÷ 2 = 1 r<strong>1</strong></li>
+              <li>1 ÷ 2 = 0 r<strong>1</strong></li>
+              <li>Read bottom to top: 1101011. Pad to 8 bits: <code>01101011₂</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pp-item">
+        <button class="pp-trigger" onclick="togglePP(this)">
+          <span class="pp-yr">CIT Supp</span>
+          <span class="pp-q">Name and describe three number systems as used in data representation in a computer.</span>
+          <span class="pp-pts">6 marks</span>
+        </button>
+        <div class="pp-body">
+          <div class="model-ans">
+            <div class="model-lbl">Model Answer (2 marks each)</div>
+            <ul>
+              <li><strong>Binary (Base-2)</strong> — Uses only digits 0 and 1. Computers use binary internally because electronic circuits have two states: on (1) and off (0).</li>
+              <li><strong>Decimal (Base-10)</strong> — Uses digits 0–9. The number system used by humans in everyday life. Computers convert to/from decimal for human-readable output.</li>
+              <li><strong>Hexadecimal (Base-16)</strong> — Uses digits 0–9 and letters A–F (A=10 to F=15). Used in programming and memory addresses as a compact way to represent binary data (1 hex digit = 4 bits).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- §07 QUIZ -->
+  <section id="quiz" class="sec">
+    <p class="sec-label">§ 07</p>
+    <h2 class="sec-title">Test <span class="acc">Yourself</span></h2>
+    <hr class="sec-rule">
+
+    <div class="quiz">
+      <div class="quiz-top">
+        <div class="quiz-top-l">
+          <h3>Number Systems Quiz</h3>
+          <p>10 questions // based on real exam questions</p>
+        </div>
+        <div class="quiz-counter"><span id="qn">1</span><span> / 10</span></div>
+      </div>
+      <div class="quiz-prog"><div class="quiz-fill" id="qf"></div></div>
+
+      <div class="quiz-inner">
+
+        <div class="qb active" data-i="0">
+          <p class="q-src">CIT3100 Supp · Q2c</p>
+          <p class="q-txt">Which number system do computers use internally for ALL data storage and processing?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'Decimal is the human system. Computers don\'t store data in decimal — they convert to/from it.')"><span class="opt-k">A</span>Decimal (Base-10)</button>
+            <button class="opt" onclick="pick(this,true,'Correct. All data inside a computer is stored as binary (0s and 1s) because electronic circuits have exactly two states: on and off.')"><span class="opt-k">B</span>Binary (Base-2)</button>
+            <button class="opt" onclick="pick(this,false,'Hex is used in programming as shorthand for binary, but computers don\'t process data in hex internally.')"><span class="opt-k">C</span>Hexadecimal (Base-16)</button>
+            <button class="opt" onclick="pick(this,false,'Octal (base-8) exists but isn\'t the primary system computers use.')"><span class="opt-k">D</span>Octal (Base-8)</button>
+          </div>
+          <div class="q-fb" id="f0"></div>
+        </div>
+
+        <div class="qb" data-i="1">
+          <p class="q-src">2025 Final Exam · Q1a</p>
+          <p class="q-txt">What is 1101₂ converted to decimal?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'Check your working: 1×8+1×4+0×2+1×1 = 8+4+0+1 = 13, not 11.')"><span class="opt-k">A</span>11</button>
+            <button class="opt" onclick="pick(this,false,'Close! That would be 1111₂. Check each bit position again.')"><span class="opt-k">B</span>15</button>
+            <button class="opt" onclick="pick(this,true,'Correct! 1×8 + 1×4 + 0×2 + 1×1 = 8+4+0+1 = 13₁₀')"><span class="opt-k">C</span>13</button>
+            <button class="opt" onclick="pick(this,false,'1101 has only 4 bits. Max value of 4-bit binary is 15 (1111). 12 would be 1100.')"><span class="opt-k">D</span>12</button>
+          </div>
+          <div class="q-fb" id="f1"></div>
+        </div>
+
+        <div class="qb" data-i="2">
+          <p class="q-src">2024 Final Exam · Q1c</p>
+          <p class="q-txt">Convert 30₁₀ to binary. What is the correct answer?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'11100 = 28₁₀, not 30. Check your division steps again.')"><span class="opt-k">A</span>11100₂</button>
+            <button class="opt" onclick="pick(this,true,'Correct! 30÷2=15 r0, 15÷2=7 r1, 7÷2=3 r1, 3÷2=1 r1, 1÷2=0 r1. Read bottom to top: 11110.')"><span class="opt-k">B</span>11110₂</button>
+            <button class="opt" onclick="pick(this,false,'11111 = 31₁₀, one too many. Double-check the remainders.')"><span class="opt-k">C</span>11111₂</button>
+            <button class="opt" onclick="pick(this,false,'10110 = 22₁₀, not 30.')"><span class="opt-k">D</span>10110₂</button>
+          </div>
+          <div class="q-fb" id="f2"></div>
+        </div>
+
+        <div class="qb" data-i="3">
+          <p class="q-src">2024 Final Exam · Q1c</p>
+          <p class="q-txt">What is the result of binary addition: 1011 + 1101?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'11110 = 30₁₀ but 1011(11) + 1101(13) = 24₁₀ = 11000. Check your carries.')"><span class="opt-k">A</span>11110₂</button>
+            <button class="opt" onclick="pick(this,true,'Correct! 1+1=10 (LSB), 1+0+1carry=10, 0+1+1carry=10, 1+1+1carry=11. Result: 11000. Verify: 11+13=24=11000₂ ✓')"><span class="opt-k">B</span>11000₂</button>
+            <button class="opt" onclick="pick(this,false,'You just concatenated the numbers. You must actually add them with carries.')"><span class="opt-k">C</span>10111011₂</button>
+            <button class="opt" onclick="pick(this,false,'10110 = 22₁₀ but 11+13=24, so this is wrong.')"><span class="opt-k">D</span>10110₂</button>
+          </div>
+          <div class="q-fb" id="f3"></div>
+        </div>
+
+        <div class="qb" data-i="4">
+          <p class="q-src">2025 Final Exam · Q1a</p>
+          <p class="q-txt">Convert 3A₁₆ to decimal. What is the correct answer?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'You may have treated A as 0. Remember A=10 in hexadecimal.')"><span class="opt-k">A</span>30</button>
+            <button class="opt" onclick="pick(this,false,'34 would come from 3×10+4. But hex uses powers of 16, not 10.')"><span class="opt-k">B</span>34</button>
+            <button class="opt" onclick="pick(this,true,'Correct! 3×16¹ + A×16⁰ = 3×16 + 10×1 = 48+10 = 58₁₀')"><span class="opt-k">C</span>58</button>
+            <button class="opt" onclick="pick(this,false,'3×16+11=59 would be 3B₁₆. A=10, not 11.')"><span class="opt-k">D</span>59</button>
+          </div>
+          <div class="q-fb" id="f4"></div>
+        </div>
+
+        <div class="qb" data-i="5">
+          <p class="q-src">CIT3100 Supp · Q2c</p>
+          <p class="q-txt">In hexadecimal, what decimal value does the letter F represent?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'F is not 6. Hex goes 0-9 then A=10, B=11, C=12, D=13, E=14, F=15.')"><span class="opt-k">A</span>6</button>
+            <button class="opt" onclick="pick(this,false,'F is not 14. That\'s E. F comes after E.')"><span class="opt-k">B</span>14</button>
+            <button class="opt" onclick="pick(this,true,'Correct! In hex: A=10, B=11, C=12, D=13, E=14, F=15. F is the highest single hex digit.')"><span class="opt-k">C</span>15</button>
+            <button class="opt" onclick="pick(this,false,'16 is the base of hex itself, not the value of F. F=15.')"><span class="opt-k">D</span>16</button>
+          </div>
+          <div class="q-fb" id="f5"></div>
+        </div>
+
+        <div class="qb" data-i="6">
+          <p class="q-src">2025 Final Exam · Q1a</p>
+          <p class="q-txt">What is 1101101₂ in decimal?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'Double check: 1×64+1×32+0×16+1×8+1×4+0×2+1×1 = 64+32+8+4+1 = 109, not 105.')"><span class="opt-k">A</span>105</button>
+            <button class="opt" onclick="pick(this,true,'Correct! Bit positions: 64+32+0+8+4+0+1 = 109₁₀')"><span class="opt-k">B</span>109</button>
+            <button class="opt" onclick="pick(this,false,'101 would be 1100101₂ = 101. Check the bit positions carefully.')"><span class="opt-k">C</span>101</button>
+            <button class="opt" onclick="pick(this,false,'That would require different bits. Work through each position systematically.')"><span class="opt-k">D</span>115</button>
+          </div>
+          <div class="q-fb" id="f6"></div>
+        </div>
+
+        <div class="qb" data-i="7">
+          <p class="q-src">2015 Final Exam · Q4c</p>
+          <p class="q-txt">What is the 8-bit binary representation of 107₁₀?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'11010110 = 214₁₀. That\'s way too big. 107 fits in 7 bits + a leading 0.')"><span class="opt-k">A</span>11010110₂</button>
+            <button class="opt" onclick="pick(this,true,'Correct! 64+32+8+2+1=107. 01101011₂. The leading 0 pads it to 8 bits.')"><span class="opt-k">B</span>01101011₂</button>
+            <button class="opt" onclick="pick(this,false,'01101010 = 106₁₀, one off. Check the last bit.')"><span class="opt-k">C</span>01101010₂</button>
+            <button class="opt" onclick="pick(this,false,'01110110 = 118₁₀, not 107.')"><span class="opt-k">D</span>01110110₂</button>
+          </div>
+          <div class="q-fb" id="f7"></div>
+        </div>
+
+        <div class="qb" data-i="8">
+          <p class="q-src">2024 Final Exam · Q1c</p>
+          <p class="q-txt">Binary subtraction: 1101 - 1011 = ?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'0001 = 1₁₀ but 13-11=2, so 0001 is wrong.')"><span class="opt-k">A</span>0001₂</button>
+            <button class="opt" onclick="pick(this,true,'Correct! 1101(13) - 1011(11) = 0010(2). Verify: 13-11=2=0010₂ ✓')"><span class="opt-k">B</span>0010₂</button>
+            <button class="opt" onclick="pick(this,false,'0110 = 6₁₀ but 13-11=2. Check your borrowing.')"><span class="opt-k">C</span>0110₂</button>
+            <button class="opt" onclick="pick(this,false,'1110 = 14₁₀. Way off — you may have added instead of subtracted.')"><span class="opt-k">D</span>1110₂</button>
+          </div>
+          <div class="q-fb" id="f8"></div>
+        </div>
+
+        <div class="qb" data-i="9">
+          <p class="q-src">CIT3100 · Q2d</p>
+          <p class="q-txt">How many bits does 1 hexadecimal digit represent?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'1 bit can only represent 2 values (0,1). Hex has 16 values per digit, so you need more bits.')"><span class="opt-k">A</span>1 bit</button>
+            <button class="opt" onclick="pick(this,false,'2 bits only gives 4 combinations (00,01,10,11). Not enough for 16 hex values.')"><span class="opt-k">B</span>2 bits</button>
+            <button class="opt" onclick="pick(this,false,'3 bits gives 8 combinations. Still not enough for 16 hex values (0-F).')"><span class="opt-k">C</span>3 bits</button>
+            <button class="opt" onclick="pick(this,true,'Correct! 4 bits = 2⁴ = 16 combinations, exactly matching the 16 hex digits (0-F). This is why hex is popular — it\'s compact binary. 2 hex digits = 1 byte (8 bits).')"><span class="opt-k">D</span>4 bits</button>
+          </div>
+          <div class="q-fb" id="f9"></div>
+        </div>
+
+        <!-- Score -->
+        <div class="score-scr" id="scr">
+          <div class="score-box">
+            <div class="score-big" id="sc-n">0</div>
+            <div class="score-den">/ 10</div>
+          </div>
+          <p class="score-v" id="sc-v"></p>
+          <p class="score-a" id="sc-a"></p>
+          <button class="qbtn qbtn-p" onclick="resetQ()">// RETRY</button>
+        </div>
+
+        <div class="quiz-foot" id="qfoot">
+          <button class="qbtn qbtn-g" id="qprev" onclick="prevQ()" disabled>← PREV</button>
+          <button class="qbtn qbtn-p" id="qnext" onclick="nextQ()" disabled>NEXT →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>CSC 2101 // TOPIC-01 // NUMBER SYSTEMS</span>
+  <a href="CSC2101_index.html">← BACK TO HOME</a>
+</footer>
+
+<script>
+// ── BINARY RAIN ──
+(function(){
+  const bg = document.getElementById('hero-bg');
+  for(let i=0;i<20;i++){
+    const col = document.createElement('div');
+    col.className = 'bin-col';
+    col.style.left = (i*5.5)+'%';
+    col.style.animationDuration = (8+Math.random()*12)+'s';
+    col.style.animationDelay = (-Math.random()*10)+'s';
+    let t='';
+    for(let j=0;j<40;j++) t += (Math.random()>0.5?'1':'0')+'\n';
+    col.textContent = t;
+    bg.appendChild(col);
+  }
+})();
+
+// ── REFERENCE TABLE ──
+const tbody = document.getElementById('ref-table');
+for(let i=0;i<=16;i++){
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${i}</td><td>${i.toString(2)}</td><td>${i.toString(16).toUpperCase()}</td>`;
+  tbody.appendChild(tr);
+}
+
+// ── SCROLL REVEAL ──
+const obs = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:0.08});
+document.querySelectorAll('.sec').forEach(s=>obs.observe(s));
+
+// ── PAST PAPERS ──
+function togglePP(btn){
+  const body = btn.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+// ── CONVERTER ──
+function doConvert(){
+  const raw = document.getElementById('conv-in').value.trim().toUpperCase();
+  const fromBase = parseInt(document.getElementById('conv-from').value);
+  if(!raw){ clearConv(); return; }
+
+  let decimal;
+  try { decimal = parseInt(raw, fromBase); } catch(e){ clearConv(); return; }
+  if(isNaN(decimal)){ document.getElementById('r-bin').textContent='Invalid input'; return; }
+
+  document.getElementById('r-bin').textContent = decimal.toString(2);
+  document.getElementById('r-dec').textContent = decimal.toString(10);
+  document.getElementById('r-hex').textContent = decimal.toString(16).toUpperCase();
+
+  let steps = '';
+  if(fromBase===10 && decimal>0){
+    steps = `// Decimal ${decimal} → Binary (repeated division by 2)\n\n`;
+    let n=decimal, rem=[], step=1;
+    while(n>0){ rem.push(n%2); steps+=`  Step ${step++}: ${n} ÷ 2 = ${Math.floor(n/2)} remainder ${n%2}\n`; n=Math.floor(n/2); }
+    steps += `\n// Read remainders bottom to top:\n  ${rem.reverse().join('')}₂`;
+  } else if(fromBase===2){
+    steps = `// Binary ${raw} → Decimal (positional weights)\n\n`;
+    const bits = raw.split('').reverse();
+    let total=0;
+    bits.forEach((b,i)=>{const w=Math.pow(2,i);const c=parseInt(b)*w;steps+=`  Bit ${bits.length-1-i}: ${b} × 2^${i} = ${b} × ${w} = ${c}\n`;total+=c;});
+    steps+=`\n// Sum: ${total}₁₀`;
+  } else if(fromBase===16){
+    steps = `// Hex ${raw} → Decimal\n\n`;
+    const digits = raw.split('').reverse();
+    let total=0;
+    digits.forEach((d,i)=>{const v=parseInt(d,16);const w=Math.pow(16,i);const c=v*w;steps+=`  ${d}(${v}) × 16^${i} = ${v} × ${w} = ${c}\n`;total+=c;});
+    steps+=`\n// Sum: ${total}₁₀`;
+  }
+
+  document.getElementById('conv-steps').textContent = steps;
+}
+
+function clearConv(){
+  ['r-bin','r-dec','r-hex'].forEach(id=>document.getElementById(id).textContent='—');
+  document.getElementById('conv-steps').textContent='// Enter a number above to see step-by-step working';
+}
+
+// ── QUIZ ──
+let cur=0,score=0,answered=Array(10).fill(false);
+
+function pick(btn,correct,msg){
+  if(answered[cur])return;
+  answered[cur]=true;
+  btn.closest('.opts').querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  const fb=document.getElementById('f'+cur);
+  fb.classList.add('show');
+  if(correct){
+    btn.classList.add('correct');score++;
+    fb.className='q-fb show good';
+    fb.innerHTML='<strong>✓ Correct</strong>'+msg;
+  } else {
+    btn.classList.add('wrong');
+    fb.className='q-fb show bad';
+    fb.innerHTML='<strong>✗ Wrong</strong>'+msg;
+    btn.closest('.opts').querySelectorAll('.opt').forEach(b=>{if(b.onclick.toString().includes(',true,'))b.classList.add('correct');});
+  }
+  document.getElementById('qnext').disabled=false;
+  updateQ();
+}
+
+function updateQ(){
+  document.getElementById('qn').textContent=cur+1;
+  const pct=answered.filter(Boolean).length/10*100;
+  document.getElementById('qf').style.width=pct+'%';
+  document.getElementById('qnext').textContent=(cur===9&&answered[cur])?'RESULTS →':'NEXT →';
+}
+
+function nextQ(){
+  if(cur<9){
+    document.querySelectorAll('.qb')[cur].classList.remove('active');
+    cur++;
+    document.querySelectorAll('.qb')[cur].classList.add('active');
+    document.getElementById('qprev').disabled=false;
+    document.getElementById('qnext').disabled=!answered[cur];
+    updateQ();
+  } else { showScore(); }
+}
+
+function prevQ(){
+  if(cur>0){
+    document.querySelectorAll('.qb')[cur].classList.remove('active');
+    cur--;
+    document.querySelectorAll('.qb')[cur].classList.add('active');
+    document.getElementById('qprev').disabled=cur===0;
+    document.getElementById('qnext').disabled=!answered[cur];
+    updateQ();
+  }
+}
+
+function showScore(){
+  document.querySelectorAll('.qb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('qfoot').style.display='none';
+  const s=document.getElementById('scr');s.classList.add('show');
+  document.getElementById('sc-n').textContent=score;
+  const p=score/10*100;
+  document.getElementById('sc-v').textContent=p>=80?'// BINARY MASTER. You\'re ready.':p>=60?'// DECENT. A few gaps.':'// KEEP PRACTICING.';
+  document.getElementById('sc-a').textContent=p>=80?'Move on. This topic is handled.':p>=60?'Review wrong answers, do it again.':'Go back through §02–§04 carefully.';
+  document.getElementById('qf').style.width='100%';
+}
+
+function resetQ(){
+  cur=0;score=0;answered=Array(10).fill(false);
+  document.querySelectorAll('.qb').forEach((b,i)=>{
+    b.classList.toggle('active',i===0);
+    b.querySelectorAll('.opt').forEach(o=>{o.disabled=false;o.classList.remove('correct','wrong');});
+    const f=document.getElementById('f'+i);
+    if(f){f.className='q-fb';f.innerHTML='';}
+  });
+  document.getElementById('scr').classList.remove('show');
+  document.getElementById('qfoot').style.display='flex';
+  document.getElementById('qprev').disabled=true;
+  document.getElementById('qnext').disabled=true;
+  document.getElementById('qnext').textContent='NEXT →';
+  document.getElementById('qf').style.width='0%';
+  document.getElementById('qn').textContent='1';
+}
+</script>
+</body>
+</html>
