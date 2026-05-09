@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Computer Hardware — CSC 2101</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Nunito:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+/* ── DESIGN: Industrial Blueprint / Hardware Schematic
+   Deep navy + electric orange. Rajdhani headers.
+   Feels like reading a technical hardware manual.
+   Nothing like the OS (dark moss) or Number Systems (black/yellow).
+────────────────────────────────────────────────────── */
+:root {
+  --navy: #0a0e1a;
+  --navy2: #0f1628;
+  --navy3: #151d35;
+  --navy4: #1c2540;
+  --border: #1e2d52;
+  --border2: #253660;
+  --text: #d4dff5;
+  --muted: #5a6e9a;
+  --orange: #ff6b2b;
+  --orange2: #ff8f5a;
+  --blue: #3a8cff;
+  --cyan: #00cfff;
+  --green: #00e5a0;
+  --red: #ff3d5a;
+  --purple: #9b7cff;
+  --gold: #ffb800;
+
+  --font-head: 'Rajdhani', sans-serif;
+  --font-body: 'Nunito', sans-serif;
+  --font-mono: 'Share Tech Mono', monospace;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--navy);
+  color: var(--text);
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* Blueprint grid overlay */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(58,140,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(58,140,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── NAV ── */
+nav {
+  position:sticky; top:0; z-index:100;
+  background: var(--navy2);
+  border-bottom: 2px solid var(--orange);
+  padding: 0 2rem;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.nav-back {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--orange);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  letter-spacing: 0.05em;
+  transition: opacity 0.2s;
+}
+.nav-back:hover { opacity: 0.65; }
+
+.nav-path {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+.nav-links {
+  margin-left: auto;
+  display: flex;
+  gap: 0.2rem;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0.3rem 0.6rem;
+  letter-spacing: 0.04em;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+.nav-links a:hover { background: rgba(255,107,43,0.1); color: var(--orange); }
+
+/* ── HERO ── */
+.hero {
+  background: var(--navy2);
+  border-bottom: 1px solid var(--border);
+  padding: 4.5rem 2rem 3.5rem;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Schematic lines decoration */
+.hero::before {
+  content:'';
+  position:absolute;
+  top:0; right:0;
+  width:400px; height:100%;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 20px,
+    rgba(255,107,43,0.03) 20px,
+    rgba(255,107,43,0.03) 21px
+  );
+}
+
+.hero::after {
+  content:'CPU';
+  position:absolute;
+  right:3rem; bottom:-1rem;
+  font-family: var(--font-head);
+  font-size:12rem;
+  font-weight:700;
+  color:rgba(255,107,43,0.04);
+  letter-spacing:-0.05em;
+  pointer-events:none;
+  line-height:1;
+}
+
+.hero-inner {
+  max-width:860px; margin:0 auto;
+  position:relative; z-index:1;
+}
+
+.hero-chip {
+  display:inline-flex;
+  align-items:center;
+  gap:0.6rem;
+  font-family:var(--font-mono);
+  font-size:0.7rem;
+  color:var(--orange);
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  border:1px solid rgba(255,107,43,0.3);
+  background:rgba(255,107,43,0.06);
+  padding:0.35rem 1rem;
+  margin-bottom:1.5rem;
+}
+
+.hero-chip::before { content:'◈'; }
+
+.hero h1 {
+  font-family: var(--font-head);
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 700;
+  line-height: 1.0;
+  letter-spacing: 0.02em;
+  color: white;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.hero h1 span { color: var(--orange); }
+
+.hero-desc {
+  font-size: 1rem;
+  color: var(--muted);
+  max-width: 560px;
+  margin-bottom: 2rem;
+  line-height: 1.8;
+}
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 3rem;
+}
+
+.htag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid;
+}
+
+.ht-o { color:var(--orange); border-color:rgba(255,107,43,0.3); background:rgba(255,107,43,0.06); }
+.ht-b { color:var(--blue);   border-color:rgba(58,140,255,0.3); background:rgba(58,140,255,0.06); }
+.ht-g { color:var(--green);  border-color:rgba(0,229,160,0.3);  background:rgba(0,229,160,0.06); }
+.ht-c { color:var(--cyan);   border-color:rgba(0,207,255,0.3);  background:rgba(0,207,255,0.06); }
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  border: 1px solid var(--border2);
+  overflow: hidden;
+}
+
+.hs {
+  padding: 1.2rem;
+  border-right: 1px solid var(--border2);
+  text-align: center;
+  background: rgba(255,255,255,0.01);
+}
+.hs:last-child { border-right: none; }
+
+.hs-n {
+  font-family: var(--font-head);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--orange);
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.hs-l {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ── CONTENT ── */
+.content { max-width:860px; margin:0 auto; padding:0 2rem 6rem; position:relative; z-index:1; }
+
+/* ── SECTION ── */
+.sec {
+  margin-top: 5rem;
+  opacity:0;
+  transform:translateY(18px);
+  transition: opacity 0.55s, transform 0.55s;
+}
+.sec.visible { opacity:1; transform:translateY(0); }
+
+.sec-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.sec-title {
+  font-family: var(--font-head);
+  font-size: 2.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: white;
+  margin-bottom: 0.3rem;
+}
+
+.sec-title .acc { color: var(--orange); }
+
+.sec-rule {
+  height: 2px;
+  border: none;
+  background: linear-gradient(90deg, var(--orange), transparent);
+  margin-bottom: 2rem;
+}
+
+/* ── COMPONENT GRID ── */
+.comp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin: 1.5rem 0;
+}
+
+.comp-card {
+  background: var(--navy3);
+  padding: 1.6rem;
+  transition: background 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.comp-card::before {
+  content:'';
+  position:absolute;
+  top:0; left:0;
+  width:3px; height:100%;
+  background: var(--card-line, var(--orange));
+  transform: scaleY(0);
+  transition: transform 0.25s;
+  transform-origin: bottom;
+}
+
+.comp-card:hover { background: var(--navy4); }
+.comp-card:hover::before { transform: scaleY(1); }
+
+.comp-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+
+.comp-name {
+  font-family: var(--font-head);
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.comp-text {
+  font-size: 0.85rem;
+  color: #8a9bbf;
+  line-height: 1.7;
+}
+
+.comp-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.15rem 0.5rem;
+  margin-bottom: 0.7rem;
+  border-radius: 1px;
+}
+
+.cb-o { background: rgba(255,107,43,0.12); color: var(--orange); border: 1px solid rgba(255,107,43,0.25); }
+.cb-b { background: rgba(58,140,255,0.12); color: var(--blue); border: 1px solid rgba(58,140,255,0.25); }
+.cb-g { background: rgba(0,229,160,0.12); color: var(--green); border: 1px solid rgba(0,229,160,0.25); }
+.cb-c { background: rgba(0,207,255,0.12); color: var(--cyan); border: 1px solid rgba(0,207,255,0.25); }
+.cb-r { background: rgba(255,61,90,0.12); color: var(--red); border: 1px solid rgba(255,61,90,0.25); }
+.cb-p { background: rgba(155,124,255,0.12); color: var(--purple); border: 1px solid rgba(155,124,255,0.25); }
+
+/* ── CALLOUTS ── */
+.callout {
+  padding: 1.1rem 1.4rem;
+  border-left: 3px solid;
+  margin: 1.5rem 0;
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+.callout strong {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.co { background:rgba(255,107,43,0.06); border-color:var(--orange); color:#e8b090; }
+.co strong { color:var(--orange); }
+.cg { background:rgba(0,229,160,0.05); border-color:var(--green); color:#90e8c0; }
+.cg strong { color:var(--green); }
+.cr { background:rgba(255,61,90,0.06); border-color:var(--red); color:#f0a0a8; }
+.cr strong { color:var(--red); }
+.cb { background:rgba(58,140,255,0.05); border-color:var(--blue); color:#90b8f0; }
+.cb strong { color:var(--blue); }
+
+/* ── COMPARE TABLE ── */
+.c-table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.87rem;
+  margin:1.5rem 0;
+  border:1px solid var(--border);
+}
+
+.c-table thead tr { background:var(--orange); }
+
+.c-table th {
+  padding:0.8rem 1.2rem;
+  text-align:left;
+  font-family:var(--font-head);
+  font-size:0.85rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:0.07em;
+  color:white;
+}
+
+.c-table td {
+  padding:0.8rem 1.2rem;
+  border-bottom:1px solid var(--border);
+  color:#8a9bbf;
+  background:var(--navy3);
+  vertical-align:top;
+}
+
+.c-table tr:hover td { background:var(--navy4); color:var(--text); }
+.c-table td:first-child { font-weight:600; color:var(--text); background:var(--navy4); }
+
+/* ── PORTS SECTION ── */
+.port-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin:1.5rem 0;
+}
+
+.port-card {
+  background: var(--navy3);
+  padding: 1.2rem;
+  transition: background 0.2s;
+}
+.port-card:hover { background: var(--navy4); }
+
+.port-name {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.4rem;
+  color: white;
+}
+
+.port-full {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.03em;
+}
+
+.port-desc { font-size: 0.82rem; color: #7a8eae; line-height: 1.6; }
+
+/* ── INTERACTIVE: DRAG QUIZ ── */
+.label-quiz {
+  background: var(--navy3);
+  border: 1px solid var(--border2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 1.5rem 0;
+}
+
+.lq-header {
+  background: var(--navy4);
+  padding: 1rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lq-title {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.lq-body { padding: 1.5rem; }
+
+.lq-desc {
+  font-size:0.85rem;
+  color:var(--muted);
+  margin-bottom:1.2rem;
+  font-family:var(--font-mono);
+  font-size:0.75rem;
+  letter-spacing:0.04em;
+}
+
+.lq-zones {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
+  gap:0.8rem;
+  margin-bottom:1.2rem;
+}
+
+.lq-zone {
+  border:2px dashed var(--border2);
+  border-radius:3px;
+  padding:0.8rem;
+  min-height:70px;
+  transition:border-color 0.2s, background 0.2s;
+  position:relative;
+}
+
+.lq-zone.drag-over {
+  border-color:var(--orange);
+  background:rgba(255,107,43,0.06);
+}
+
+.lq-zone.correct { border-color:var(--green); border-style:solid; background:rgba(0,229,160,0.05); }
+.lq-zone.wrong   { border-color:var(--red);   border-style:solid; background:rgba(255,61,90,0.05); }
+
+.lq-zone-label {
+  font-family:var(--font-mono);
+  font-size:0.68rem;
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  color:var(--muted);
+  margin-bottom:0.5rem;
+}
+
+.lq-chips {
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.5rem;
+  margin-bottom:1rem;
+}
+
+.lq-chip {
+  font-family:var(--font-mono);
+  font-size:0.75rem;
+  padding:0.4rem 0.8rem;
+  background:rgba(255,107,43,0.1);
+  border:1px solid rgba(255,107,43,0.3);
+  color:var(--orange);
+  cursor:grab;
+  border-radius:2px;
+  transition:all 0.15s;
+  user-select:none;
+}
+
+.lq-chip:hover { background:rgba(255,107,43,0.18); transform:translateY(-1px); }
+.lq-chip.placed { opacity:0.35; cursor:default; pointer-events:none; }
+
+.placed-chip {
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  padding:0.3rem 0.7rem;
+  background:rgba(58,140,255,0.1);
+  border:1px solid rgba(58,140,255,0.3);
+  color:var(--blue);
+  border-radius:2px;
+  cursor:pointer;
+  display:inline-block;
+}
+
+.lq-btns { display:flex; gap:0.8rem; }
+
+.lq-btn {
+  font-family:var(--font-head);
+  font-size:0.85rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:0.07em;
+  padding:0.6rem 1.4rem;
+  cursor:pointer;
+  border:none;
+  border-radius:2px;
+  transition:all 0.15s;
+}
+
+.lq-btn-check { background:var(--orange); color:white; }
+.lq-btn-check:hover { background:var(--orange2); }
+.lq-btn-reset { background:transparent; color:var(--muted); border:1px solid var(--border2); }
+.lq-btn-reset:hover { color:var(--text); border-color:var(--muted); }
+
+/* ── PAST PAPERS ── */
+.pp-list { display:flex; flex-direction:column; gap:0.8rem; }
+
+.pp-item {
+  border:1px solid var(--border);
+  overflow:hidden;
+  transition:border-color 0.2s;
+}
+.pp-item:hover { border-color:var(--border2); }
+
+.pp-trigger {
+  width:100%;
+  background:var(--navy3);
+  border:none;
+  padding:1rem 1.4rem;
+  display:flex;
+  align-items:flex-start;
+  gap:0.9rem;
+  cursor:pointer;
+  text-align:left;
+  font-family:var(--font-body);
+  transition:background 0.15s;
+}
+.pp-trigger:hover { background:var(--navy4); }
+
+.pp-yr {
+  font-family:var(--font-mono);
+  font-size:0.65rem;
+  font-weight:600;
+  background:var(--orange);
+  color:white;
+  padding:0.2rem 0.6rem;
+  white-space:nowrap;
+  flex-shrink:0;
+  margin-top:2px;
+}
+
+.pp-q { font-size:0.9rem; font-weight:600; color:var(--text); line-height:1.5; flex:1; }
+
+.pp-pts {
+  font-family:var(--font-mono);
+  font-size:0.65rem;
+  color:var(--gold);
+  border:1px solid rgba(255,184,0,0.3);
+  padding:0.2rem 0.6rem;
+  white-space:nowrap;
+  flex-shrink:0;
+  margin-top:2px;
+}
+
+.pp-body {
+  display:none;
+  padding:1.4rem;
+  background:var(--navy2);
+  border-top:1px solid var(--border);
+  font-size:0.87rem;
+  line-height:1.8;
+  color:#8a9bbf;
+}
+.pp-body.open { display:block; }
+
+.model-ans {
+  background:var(--navy3);
+  border:1px solid rgba(0,229,160,0.2);
+  padding:1.2rem;
+}
+
+.model-lbl {
+  font-family:var(--font-mono);
+  font-size:0.65rem;
+  text-transform:uppercase;
+  letter-spacing:0.12em;
+  color:var(--green);
+  margin-bottom:0.8rem;
+  font-weight:600;
+}
+
+.model-ans ul { padding-left:1.2rem; }
+.model-ans li { margin-bottom:0.5rem; color:var(--text); }
+.model-ans li strong { color:var(--orange); }
+
+/* ── QUIZ ── */
+.quiz {
+  background: var(--navy3);
+  border: 2px solid var(--orange);
+  overflow: hidden;
+}
+
+.quiz-top {
+  background: var(--orange);
+  padding: 1.4rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.quiz-top-l h3 {
+  font-family: var(--font-head);
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: white;
+}
+
+.quiz-top-l p {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.06em;
+}
+
+.q-counter {
+  font-family: var(--font-head);
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+}
+.q-counter span { font-size: 1rem; opacity: 0.5; }
+
+.q-prog { height: 3px; background: rgba(255,255,255,0.2); }
+.q-fill { height:100%; background:white; transition:width 0.4s; width:0%; }
+
+.quiz-inner { padding:2rem; }
+
+.qb { display:none; }
+.qb.active { display:block; }
+
+.q-src {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  margin-bottom: 0.8rem;
+}
+
+.q-txt {
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 1.8rem;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+
+.opts { display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1.5rem; }
+
+.opt {
+  background: var(--navy4);
+  border: 1.5px solid var(--border2);
+  padding: 0.85rem 1.1rem;
+  color: #8a9bbf;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  transition: all 0.15s;
+}
+
+.opt:hover:not(:disabled) {
+  border-color: var(--orange);
+  color: var(--text);
+  background: rgba(255,107,43,0.06);
+}
+
+.opt-k {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  width:26px; height:26px;
+  border:1px solid var(--border2);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+  transition:all 0.15s;
+}
+
+.opt:hover:not(:disabled) .opt-k { border-color:var(--orange); color:var(--orange); }
+.opt.correct { border-color:var(--green); color:var(--green); background:rgba(0,229,160,0.06); }
+.opt.correct .opt-k { background:var(--green); color:var(--navy); border-color:var(--green); }
+.opt.wrong { border-color:var(--red); color:#ff9999; background:rgba(255,61,90,0.06); }
+.opt.wrong .opt-k { background:var(--red); color:white; border-color:var(--red); }
+.opt:disabled { cursor:default; }
+
+.q-fb {
+  display:none;
+  padding:0.9rem 1.1rem;
+  font-size:0.87rem;
+  line-height:1.7;
+  margin-bottom:1rem;
+  border:1px solid;
+}
+.q-fb.show { display:block; }
+.q-fb.good { border-color:rgba(0,229,160,0.3); background:rgba(0,229,160,0.05); color:#80e8b8; }
+.q-fb.bad  { border-color:rgba(255,61,90,0.3);  background:rgba(255,61,90,0.05);  color:#f0a0a8; }
+.q-fb strong { display:block; margin-bottom:0.3rem; font-family:var(--font-mono); font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; }
+
+.quiz-foot {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding-top:1.2rem;
+  border-top:1px solid var(--border);
+}
+
+.qbtn {
+  font-family:var(--font-head);
+  font-size:0.9rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:0.07em;
+  padding:0.65rem 1.4rem;
+  cursor:pointer;
+  border:none;
+  transition:all 0.15s;
+}
+.qbtn-p { background:var(--orange); color:white; }
+.qbtn-p:hover { background:var(--orange2); }
+.qbtn-p:disabled { opacity:0.35; cursor:default; }
+.qbtn-g { background:transparent; color:var(--muted); border:1px solid var(--border2); }
+.qbtn-g:hover { color:var(--text); border-color:var(--muted); }
+.qbtn-g:disabled { opacity:0.3; cursor:default; }
+
+/* Score */
+.score-scr { display:none; text-align:center; padding:3rem 2rem; }
+.score-scr.show { display:block; }
+
+.score-box {
+  display:inline-flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  width:130px; height:130px;
+  border:3px solid var(--orange);
+  background:rgba(255,107,43,0.05);
+  margin:0 auto 1.5rem;
+}
+
+.score-big { font-family:var(--font-head); font-size:3rem; font-weight:700; color:var(--orange); line-height:1; }
+.score-den { font-family:var(--font-mono); font-size:0.75rem; color:var(--muted); }
+.score-v { font-family:var(--font-head); font-size:1.2rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:white; margin-bottom:0.5rem; }
+.score-a { font-size:0.85rem; color:var(--muted); margin-bottom:2rem; }
+
+/* ── FOOTER ── */
+footer {
+  background:var(--navy2);
+  border-top:2px solid var(--orange);
+  padding:1.5rem 2rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  color:var(--muted);
+  position:relative; z-index:1;
+}
+footer a { color:var(--orange); text-decoration:none; }
+footer a:hover { opacity:0.7; }
+
+/* ── MOBILE ── */
+@media (max-width:700px) {
+  .hero h1 { font-size:2.5rem; }
+  .hero-stats { grid-template-columns:repeat(2,1fr); }
+  nav .nav-links { display:none; }
+  .content { padding:0 1.2rem 4rem; }
+  .comp-grid { grid-template-columns:1fr; }
+  .port-grid { grid-template-columns:1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="CSC2101_index.html" class="nav-back">← HOME</a>
+  <span class="nav-path">CSC2101 / TOPIC-02 / COMPUTER-HARDWARE</span>
+  <ul class="nav-links">
+    <li><a href="#components">§01</a></li>
+    <li><a href="#cpu">§02</a></li>
+    <li><a href="#storage">§03</a></li>
+    <li><a href="#ports">§04</a></li>
+    <li><a href="#io">§05</a></li>
+    <li><a href="#past">§06</a></li>
+    <li><a href="#quiz">§07</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-chip">Topic 02 · CSC 2101 Computer Systems</div>
+    <h1>Computer<br><span>Hardware</span></h1>
+    <p class="hero-desc">The physical components that make a computer work. Understand what every part does and you're ready for 20+ marks across Section A and B.</p>
+    <div class="hero-tags">
+      <span class="htag ht-o">2025 Q2 · 20 marks</span>
+      <span class="htag ht-b">CPU · RAM · Motherboard</span>
+      <span class="htag ht-g">HDD vs SSD</span>
+      <span class="htag ht-c">Input · Output · Ports</span>
+    </div>
+    <div class="hero-stats">
+      <div class="hs"><div class="hs-n">5</div><div class="hs-l">Major Components</div></div>
+      <div class="hs"><div class="hs-n">15</div><div class="hs-l">Past Questions</div></div>
+      <div class="hs"><div class="hs-n">5+</div><div class="hs-l">Exam Years</div></div>
+      <div class="hs"><div class="hs-n">10</div><div class="hs-l">Quiz Questions</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="content">
+
+  <!-- §01 MAIN COMPONENTS -->
+  <section id="components" class="sec">
+    <p class="sec-label">§ 01</p>
+    <h2 class="sec-title">Core <span class="acc">Components</span></h2>
+    <hr class="sec-rule">
+
+    <div class="callout cr">
+      <strong>⚠ Exam Alert — 2025 Q2a (5 marks)</strong>
+      "Describe the function of: CPU, RAM, Storage device, Input device" — straight 5 marks. One sentence per component is enough but it must be precise.
+    </div>
+
+    <div class="comp-grid">
+      <div class="comp-card" style="--card-line:var(--orange)">
+        <div class="comp-icon">⚙️</div>
+        <span class="comp-badge cb-o">Processing</span>
+        <div class="comp-name">CPU</div>
+        <div class="comp-text">The brain of the computer. Fetches, decodes, and executes instructions. Contains the ALU (arithmetic/logic), Control Unit, and Registers. Clock speed (GHz) and number of cores determine performance.</div>
+      </div>
+      <div class="comp-card" style="--card-line:var(--blue)">
+        <div class="comp-icon">🧮</div>
+        <span class="comp-badge cb-b">Memory</span>
+        <div class="comp-name">RAM</div>
+        <div class="comp-text">Temporary working memory. Stores programs and data currently in use by the CPU. <strong>Volatile</strong> — contents lost when power is off. More RAM = faster multitasking. Measured in GB.</div>
+      </div>
+      <div class="comp-card" style="--card-line:var(--green)">
+        <div class="comp-icon">💾</div>
+        <span class="comp-badge cb-g">Storage</span>
+        <div class="comp-name">Storage Device</div>
+        <div class="comp-text">Permanently stores data even when the computer is off (non-volatile). Examples: HDD, SSD, USB flash drive, optical disc. Measured in GB/TB.</div>
+      </div>
+      <div class="comp-card" style="--card-line:var(--cyan)">
+        <div class="comp-icon">⌨️</div>
+        <span class="comp-badge cb-c">Input</span>
+        <div class="comp-name">Input Device</div>
+        <div class="comp-text">Allows users to send data INTO the computer. Examples: keyboard, mouse, scanner, microphone, webcam, touchscreen, barcode scanner.</div>
+      </div>
+      <div class="comp-card" style="--card-line:var(--purple)">
+        <div class="comp-icon">🖥️</div>
+        <span class="comp-badge cb-p">Output</span>
+        <div class="comp-name">Output Device</div>
+        <div class="comp-text">Delivers processed results FROM the computer to the user. Examples: monitor, printer, speakers, projector, headphones.</div>
+      </div>
+      <div class="comp-card" style="--card-line:var(--gold)">
+        <div class="comp-icon">🔌</div>
+        <span class="comp-badge" style="background:rgba(255,184,0,0.1);color:var(--gold);border:1px solid rgba(255,184,0,0.25)">Foundation</span>
+        <div class="comp-name">Motherboard</div>
+        <div class="comp-text">The backbone of the computer — a printed circuit board (PCB) that connects all components. Contains CPU socket, RAM slots, expansion slots, BIOS chip, SATA connectors, and chipset.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §02 CPU DETAIL -->
+  <section id="cpu" class="sec">
+    <p class="sec-label">§ 02</p>
+    <h2 class="sec-title">CPU <span class="acc">Performance</span></h2>
+    <hr class="sec-rule">
+
+    <div class="callout co">
+      <strong>Exam Alert — 2025 Q3c (6 marks)</strong>
+      "Explain how clock speed and number of cores affect system performance" — this bridges the hardware and CPU topics. Know both clearly.
+    </div>
+
+    <div class="comp-grid">
+      <div class="comp-card" style="--card-line:var(--orange)">
+        <div class="comp-icon">⏱️</div>
+        <div class="comp-name">Clock Speed</div>
+        <div class="comp-text">Measured in GHz (gigahertz). Represents how many cycles per second the CPU executes. A 3.5GHz CPU performs 3.5 billion cycles per second. Higher clock speed = faster processing of each instruction.</div>
+      </div>
+      <div class="comp-card" style="--card-line:var(--blue)">
+        <div class="comp-icon">🔲</div>
+        <div class="comp-name">CPU Cores</div>
+        <div class="comp-text">A core is an independent processing unit inside the CPU. Dual-core = 2 cores, Quad-core = 4 cores. More cores = better multitasking. Each core can handle a separate task simultaneously.</div>
+      </div>
+      <div class="comp-card" style="--card-line:var(--green)">
+        <div class="comp-icon">📦</div>
+        <div class="comp-name">Cache Memory</div>
+        <div class="comp-text">Ultra-fast memory built into the CPU. L1 (fastest, smallest), L2, L3 (slowest, largest). Stores recently used data so the CPU doesn't have to fetch from slower RAM repeatedly.</div>
+      </div>
+    </div>
+
+    <div class="callout cb">
+      <strong>Exam Answer Template — 2025 Q3c</strong>
+      "Clock speed determines how fast the CPU executes individual instructions — a higher GHz means more instructions per second. The number of cores determines how many tasks can be processed simultaneously — a quad-core CPU can handle 4 tasks at once, improving multitasking performance significantly."
+    </div>
+  </section>
+
+  <!-- §03 STORAGE -->
+  <section id="storage" class="sec">
+    <p class="sec-label">§ 03</p>
+    <h2 class="sec-title">Storage <span class="acc">Devices</span></h2>
+    <hr class="sec-rule">
+
+    <div class="callout cr">
+      <strong>⚠ Exam Alert — 2025 Q2b (4 marks)</strong>
+      "Differentiate between HDD and SSD" — this is a guaranteed 4 marks. Know at least 4 differences.
+    </div>
+
+    <table class="c-table">
+      <thead>
+        <tr><th>Feature</th><th>HDD (Hard Disk Drive)</th><th>SSD (Solid State Drive)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Technology</td><td>Magnetic spinning platters</td><td>Flash memory (no moving parts)</td></tr>
+        <tr><td>Speed</td><td>Slower (mechanical read/write)</td><td>Much faster (electronic)</td></tr>
+        <tr><td>Durability</td><td>Fragile — sensitive to shocks/drops</td><td>More durable, resistant to shock</td></tr>
+        <tr><td>Noise</td><td>Makes noise (spinning disk)</td><td>Silent operation</td></tr>
+        <tr><td>Power use</td><td>Uses more power, generates heat</td><td>Energy efficient, less heat</td></tr>
+        <tr><td>Cost</td><td>Cheaper per GB</td><td>More expensive per GB</td></tr>
+        <tr><td>Lifespan</td><td>Mechanical wear over time</td><td>Limited write cycles but generally longer</td></tr>
+        <tr><td>Size</td><td>Bulkier (3.5" or 2.5")</td><td>Compact (2.5", M.2, or PCIe card)</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-family:var(--font-head);font-size:1.2rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:white;margin:1.5rem 0 0.8rem">Other Storage Types</h3>
+    <div class="comp-grid">
+      <div class="comp-card" style="--card-line:var(--cyan)">
+        <div class="comp-icon">💿</div>
+        <div class="comp-name">Optical Storage</div>
+        <div class="comp-text">Uses lasers to read/write. CD (700MB), DVD (4.7–8.5GB), Blu-ray (25–50GB). Can be read-only, write-once, or re-writable.</div>
+      </div>
+      <div class="comp-card" style="--card-line:var(--purple)">
+        <div class="comp-icon">🔌</div>
+        <div class="comp-name">Flash / USB Drive</div>
+        <div class="comp-text">Portable flash memory storage. Non-volatile, no moving parts. Connects via USB. Common sizes: 8GB–1TB.</div>
+      </div>
+      <div class="comp-card" style="--card-line:var(--green)">
+        <div class="comp-icon">📼</div>
+        <div class="comp-name">Magnetic Tape</div>
+        <div class="comp-text">Sequential access storage. Slow but very cheap for large archives. Used for backups and long-term data storage in enterprise environments.</div>
+      </div>
+    </div>
+
+    <div class="callout cg">
+      <strong>Volatile vs Non-Volatile — Exam Q (2025 Q3d)</strong>
+      <strong>Volatile:</strong> loses data when power is off. Examples: RAM, Cache. <strong>Non-volatile:</strong> retains data without power. Examples: HDD, SSD, USB flash drive, ROM, optical disc.
+    </div>
+  </section>
+
+  <!-- §04 PORTS -->
+  <section id="ports" class="sec">
+    <p class="sec-label">§ 04</p>
+    <h2 class="sec-title">Computer <span class="acc">Ports</span></h2>
+    <hr class="sec-rule">
+
+    <div class="callout co">
+      <strong>Exam Alert — 2025 Q2c (4 marks)</strong>
+      "Explain what is meant by computer ports, giving two examples."
+    </div>
+
+    <div class="callout cb">
+      <strong>Definition</strong>
+      A port is a physical connection point (socket/interface) on a computer that allows external devices to be connected. Ports enable communication between the computer and peripherals.
+    </div>
+
+    <div class="port-grid">
+      <div class="port-card">
+        <div class="port-name">USB</div>
+        <div class="port-full">Universal Serial Bus</div>
+        <div class="port-desc">Most common port. Used for keyboards, mice, flash drives, phones. USB-A, USB-C, USB 3.0.</div>
+      </div>
+      <div class="port-card">
+        <div class="port-name">HDMI</div>
+        <div class="port-full">High-Definition Multimedia Interface</div>
+        <div class="port-desc">Transmits both audio and video digitally. Used to connect monitors, TVs, projectors.</div>
+      </div>
+      <div class="port-card">
+        <div class="port-name">VGA</div>
+        <div class="port-full">Video Graphics Array</div>
+        <div class="port-desc">Older analog video port. Still found on many projectors and older monitors. 15-pin connector.</div>
+      </div>
+      <div class="port-card">
+        <div class="port-name">Ethernet</div>
+        <div class="port-full">RJ-45 Network Port</div>
+        <div class="port-desc">Wired network connection. Connects computer to router/switch for internet or LAN access.</div>
+      </div>
+      <div class="port-card">
+        <div class="port-name">Audio</div>
+        <div class="port-full">3.5mm Jack</div>
+        <div class="port-desc">For headphones and microphones. Green = output (speakers), Pink = input (mic), Blue = line-in.</div>
+      </div>
+      <div class="port-card">
+        <div class="port-name">SATA</div>
+        <div class="port-full">Serial ATA</div>
+        <div class="port-desc">Internal port on motherboard for connecting HDD/SSD storage drives. SATA 3 = 6Gbps.</div>
+      </div>
+      <div class="port-card">
+        <div class="port-name">DisplayPort</div>
+        <div class="port-full">DP / Mini DP</div>
+        <div class="port-desc">High-performance digital display interface. Supports high refresh rates and multiple monitors.</div>
+      </div>
+      <div class="port-card">
+        <div class="port-name">PS/2</div>
+        <div class="port-full">Personal System/2</div>
+        <div class="port-desc">Older port for keyboards (purple) and mice (green). Largely replaced by USB.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §05 INPUT/OUTPUT -->
+  <section id="io" class="sec">
+    <p class="sec-label">§ 05</p>
+    <h2 class="sec-title">Input <span class="acc">&amp;</span> Output Devices</h2>
+    <hr class="sec-rule">
+
+    <div class="callout co">
+      <strong>Exam Alert — 2025 Q2d (4 marks) · Dec 2015 Q4b–c</strong>
+      "State two input devices and two output devices." Simple marks — don't overcomplicate. Name the device + one line about its function.
+    </div>
+
+    <table class="c-table">
+      <thead><tr><th>Input Devices</th><th>Function</th><th>Output Devices</th><th>Function</th></tr></thead>
+      <tbody>
+        <tr><td>Keyboard</td><td>Types text and commands into computer</td><td>Monitor</td><td>Displays visual output from the computer</td></tr>
+        <tr><td>Mouse</td><td>Controls pointer, selects items on screen</td><td>Printer</td><td>Produces physical (paper) copies of documents</td></tr>
+        <tr><td>Scanner</td><td>Digitizes physical documents/images</td><td>Speakers</td><td>Outputs audio from the computer</td></tr>
+        <tr><td>Microphone</td><td>Captures audio input into the computer</td><td>Projector</td><td>Displays large-scale visual output on screen/wall</td></tr>
+        <tr><td>Webcam</td><td>Captures video/image input</td><td>Headphones</td><td>Personal audio output device</td></tr>
+        <tr><td>Touchscreen</td><td>Input via touch/gesture on screen</td><td>Plotter</td><td>Produces large format diagrams/drawings</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-family:var(--font-head);font-size:1.2rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:white;margin:1.5rem 0 0.8rem">Printer Types — 2024 Q5b</h3>
+    <table class="c-table">
+      <thead><tr><th>Printer Type</th><th>How it Works</th><th>Used For</th></tr></thead>
+      <tbody>
+        <tr><td>Inkjet</td><td>Sprays tiny ink droplets onto paper</td><td>Home use, photos, color printing</td></tr>
+        <tr><td>Laser</td><td>Uses laser + toner powder fused by heat</td><td>Office, high-volume, fast printing</td></tr>
+        <tr><td>Thermal</td><td>Heat activates special heat-sensitive paper</td><td>Receipts, labels, ATM slips</td></tr>
+        <tr><td>Impact / Dot Matrix</td><td>Pins strike ribbon to print characters</td><td>Carbon copies, warehouses, old systems</td></tr>
+        <tr><td>3D Printer</td><td>Deposits material layer by layer</td><td>Prototypes, medical models, manufacturing</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- §06 PAST PAPERS -->
+  <section id="past" class="sec">
+    <p class="sec-label">§ 06</p>
+    <h2 class="sec-title">Past Paper <span class="acc">Questions</span></h2>
+    <hr class="sec-rule">
+    <p style="color:var(--muted);font-size:0.85rem;font-family:var(--font-mono);margin-bottom:1.5rem">// Think before you click. Answer in your head first.</p>
+
+    <div class="pp-list">
+
+      <div class="pp-item">
+        <button class="pp-trigger" onclick="togglePP(this)">
+          <span class="pp-yr">2025</span>
+          <span class="pp-q">Describe the function of: (a) CPU (b) RAM (c) Storage device (d) Input device</span>
+          <span class="pp-pts">5 marks</span>
+        </button>
+        <div class="pp-body">
+          <div class="model-ans">
+            <div class="model-lbl">Model Answer</div>
+            <ul>
+              <li><strong>CPU</strong> — The Central Processing Unit is the brain of the computer. It fetches, decodes, and executes instructions. It contains the Control Unit, ALU, and registers.</li>
+              <li><strong>RAM</strong> — Random Access Memory is the computer's temporary working memory. It stores programs and data currently in use by the CPU. It is volatile — data is lost when power is off.</li>
+              <li><strong>Storage device</strong> — Permanently stores data even when the computer is powered off (non-volatile). Examples include HDD, SSD, and USB flash drives.</li>
+              <li><strong>Input device</strong> — Hardware that allows users to enter data into the computer. Examples: keyboard (types text), mouse (controls pointer), scanner (digitizes documents).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pp-item">
+        <button class="pp-trigger" onclick="togglePP(this)">
+          <span class="pp-yr">2025</span>
+          <span class="pp-q">Differentiate between HDD and SSD (4 marks)</span>
+          <span class="pp-pts">4 marks</span>
+        </button>
+        <div class="pp-body">
+          <div class="model-ans">
+            <div class="model-lbl">Model Answer — need at least 4 differences</div>
+            <ul>
+              <li><strong>Technology:</strong> HDD uses magnetic spinning platters to store data; SSD uses flash memory chips with no moving parts.</li>
+              <li><strong>Speed:</strong> SSDs are significantly faster at reading and writing data than HDDs due to electronic rather than mechanical operation.</li>
+              <li><strong>Durability:</strong> HDDs are fragile and sensitive to physical shock due to moving parts; SSDs are more durable.</li>
+              <li><strong>Noise:</strong> HDDs produce mechanical noise; SSDs operate silently.</li>
+              <li><strong>Cost:</strong> HDDs are cheaper per GB; SSDs cost more per GB but prices are falling.</li>
+              <li><strong>Power:</strong> SSDs consume less power and generate less heat than HDDs.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pp-item">
+        <button class="pp-trigger" onclick="togglePP(this)">
+          <span class="pp-yr">2025</span>
+          <span class="pp-q">Explain what is meant by computer ports, giving two examples (4 marks)</span>
+          <span class="pp-pts">4 marks</span>
+        </button>
+        <div class="pp-body">
+          <div class="model-ans">
+            <div class="model-lbl">Model Answer</div>
+            <ul>
+              <li>A <strong>computer port</strong> is a physical interface or connection point on a computer that enables external devices (peripherals) to be attached and communicate with the computer system.</li>
+              <li><strong>USB (Universal Serial Bus)</strong> — The most common port, used to connect keyboards, mice, flash drives, smartphones, and other peripherals. Supports data transfer and power delivery.</li>
+              <li><strong>HDMI (High-Definition Multimedia Interface)</strong> — Transmits both high-definition audio and video signals digitally. Used to connect monitors, televisions, and projectors to a computer.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pp-item">
+        <button class="pp-trigger" onclick="togglePP(this)">
+          <span class="pp-yr">2025</span>
+          <span class="pp-q">State two input devices and two output devices (4 marks)</span>
+          <span class="pp-pts">4 marks</span>
+        </button>
+        <div class="pp-body">
+          <div class="model-ans">
+            <div class="model-lbl">Model Answer (1 mark each)</div>
+            <ul>
+              <li><strong>Input — Keyboard:</strong> Allows the user to type text and commands into the computer.</li>
+              <li><strong>Input — Mouse:</strong> A pointing device that controls the cursor on screen and allows selection of items.</li>
+              <li><strong>Output — Monitor:</strong> Displays the visual output (text, images, video) processed by the computer.</li>
+              <li><strong>Output — Printer:</strong> Produces a physical (hard copy) of documents and images on paper.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pp-item">
+        <button class="pp-trigger" onclick="togglePP(this)">
+          <span class="pp-yr">2025 Q3c</span>
+          <span class="pp-q">Explain how clock speed and number of cores affect system performance (6 marks)</span>
+          <span class="pp-pts">6 marks</span>
+        </button>
+        <div class="pp-body">
+          <div class="model-ans">
+            <div class="model-lbl">Model Answer</div>
+            <ul>
+              <li><strong>Clock Speed:</strong> Measured in GHz, clock speed determines how many instruction cycles the CPU executes per second. A higher clock speed means the CPU processes individual instructions faster, improving performance for tasks that are single-threaded.</li>
+              <li><strong>Number of Cores:</strong> Each core is an independent processing unit. Multiple cores allow the CPU to process several tasks simultaneously (parallel processing). A quad-core CPU can handle 4 threads at once, improving performance for multitasking and multi-threaded applications.</li>
+              <li><strong>Combined effect:</strong> A CPU with both high clock speed AND multiple cores delivers the best overall performance — high clock speed handles fast single tasks while multiple cores improve simultaneous processing.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pp-item">
+        <button class="pp-trigger" onclick="togglePP(this)">
+          <span class="pp-yr">Dec 2015</span>
+          <span class="pp-q">Name TWO input peripherals with ONE advantage each. Name TWO output peripherals with ONE advantage each.</span>
+          <span class="pp-pts">8 marks</span>
+        </button>
+        <div class="pp-body">
+          <div class="model-ans">
+            <div class="model-lbl">Model Answer (2 marks each)</div>
+            <ul>
+              <li><strong>Input — Keyboard:</strong> Advantage: Allows fast, accurate text input and supports shortcuts that speed up workflow.</li>
+              <li><strong>Input — Scanner:</strong> Advantage: Converts physical documents into digital format, enabling easy storage and sharing.</li>
+              <li><strong>Output — Monitor:</strong> Advantage: Provides immediate visual feedback, allowing users to interact with the computer in real time.</li>
+              <li><strong>Output — Printer:</strong> Advantage: Produces permanent, portable hard copies of digital documents for sharing or filing.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- §07 QUIZ -->
+  <section id="quiz" class="sec">
+    <p class="sec-label">§ 07</p>
+    <h2 class="sec-title">Test <span class="acc">Yourself</span></h2>
+    <hr class="sec-rule">
+
+    <div class="quiz">
+      <div class="quiz-top">
+        <div class="quiz-top-l">
+          <h3>Computer Hardware Quiz</h3>
+          <p>10 QUESTIONS // EXAM-STYLE // NO HINTS</p>
+        </div>
+        <div class="q-counter"><span id="qn">1</span><span> / 10</span></div>
+      </div>
+      <div class="q-prog"><div class="q-fill" id="qf"></div></div>
+
+      <div class="quiz-inner">
+
+        <div class="qb active" data-i="0">
+          <p class="q-src">2025 Final · Q2a</p>
+          <p class="q-txt">Which component is responsible for executing instructions and performing calculations in a computer?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'RAM stores data temporarily but it doesn\'t process or execute instructions.')"><span class="opt-k">A</span>RAM</button>
+            <button class="opt" onclick="pick(this,true,'Correct! The CPU (Central Processing Unit) is the brain of the computer. It fetches, decodes, and executes all instructions.')"><span class="opt-k">B</span>CPU</button>
+            <button class="opt" onclick="pick(this,false,'The HDD stores data permanently but has no processing capability.')"><span class="opt-k">C</span>HDD</button>
+            <button class="opt" onclick="pick(this,false,'The motherboard connects components but doesn\'t execute instructions itself.')"><span class="opt-k">D</span>Motherboard</button>
+          </div>
+          <div class="q-fb" id="f0"></div>
+        </div>
+
+        <div class="qb" data-i="1">
+          <p class="q-src">2025 Final · Q2b</p>
+          <p class="q-txt">Which of the following is a key advantage of an SSD over an HDD?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'Actually the opposite — HDDs are cheaper per GB than SSDs.')"><span class="opt-k">A</span>SSDs are cheaper per GB of storage</button>
+            <button class="opt" onclick="pick(this,false,'HDDs typically have higher capacities available at lower cost, not SSDs.')"><span class="opt-k">B</span>SSDs have much higher storage capacity</button>
+            <button class="opt" onclick="pick(this,true,'Correct! SSDs have no moving parts — they use flash memory. This makes them faster, quieter, more durable, and more energy efficient than HDDs.')"><span class="opt-k">C</span>SSDs have no moving parts, making them faster and more durable</button>
+            <button class="opt" onclick="pick(this,false,'SSDs are actually newer technology than HDDs, not older.')"><span class="opt-k">D</span>SSDs use older, more reliable magnetic technology</button>
+          </div>
+          <div class="q-fb" id="f1"></div>
+        </div>
+
+        <div class="qb" data-i="2">
+          <p class="q-src">2025 Final · Q2c</p>
+          <p class="q-txt">A student connects her phone to the computer to charge it and transfer files. Which port is she most likely using?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'HDMI transmits audio/video signals to displays — not used for phones or file transfer.')"><span class="opt-k">A</span>HDMI</button>
+            <button class="opt" onclick="pick(this,false,'VGA is a video-only output port for monitors. Not used for phones.')"><span class="opt-k">B</span>VGA</button>
+            <button class="opt" onclick="pick(this,true,'Correct! USB (Universal Serial Bus) is the standard port for connecting phones, transferring files, and charging devices.')"><span class="opt-k">C</span>USB</button>
+            <button class="opt" onclick="pick(this,false,'PS/2 is an old port for keyboards and mice only. Replaced by USB.')"><span class="opt-k">D</span>PS/2</button>
+          </div>
+          <div class="q-fb" id="f2"></div>
+        </div>
+
+        <div class="qb" data-i="3">
+          <p class="q-src">2025 Final · Q2a</p>
+          <p class="q-txt">RAM is described as "volatile" memory. What does this mean?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'Volatile has nothing to do with chemical explosiveness — it refers to data persistence.')"><span class="opt-k">A</span>It can overheat and catch fire easily</button>
+            <button class="opt" onclick="pick(this,false,'The opposite — volatile memory loses data, non-volatile storage (HDD/SSD) retains it.')"><span class="opt-k">B</span>It permanently stores data even without power</button>
+            <button class="opt" onclick="pick(this,true,'Correct! Volatile means the data is lost when power is turned off. RAM only holds data while the computer is running.')"><span class="opt-k">C</span>Its data is lost when the computer is switched off</button>
+            <button class="opt" onclick="pick(this,false,'Speed is not what makes memory volatile or non-volatile.')"><span class="opt-k">D</span>It is faster than non-volatile memory</button>
+          </div>
+          <div class="q-fb" id="f3"></div>
+        </div>
+
+        <div class="qb" data-i="4">
+          <p class="q-src">Dec 2015 · Q4b</p>
+          <p class="q-txt">Which of the following is an INPUT device?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'A monitor displays output — it receives data FROM the computer, not INTO it.')"><span class="opt-k">A</span>Monitor</button>
+            <button class="opt" onclick="pick(this,false,'A printer produces physical output — it receives data FROM the computer.')"><span class="opt-k">B</span>Printer</button>
+            <button class="opt" onclick="pick(this,false,'Speakers output audio — they receive processed data from the computer.')"><span class="opt-k">C</span>Speakers</button>
+            <button class="opt" onclick="pick(this,true,'Correct! A scanner is an input device — it digitizes physical documents and sends that data INTO the computer.')"><span class="opt-k">D</span>Scanner</button>
+          </div>
+          <div class="q-fb" id="f4"></div>
+        </div>
+
+        <div class="qb" data-i="5">
+          <p class="q-src">2025 Final · Q3c</p>
+          <p class="q-txt">A computer has a 2-core CPU at 2GHz and another has a 4-core CPU at 2GHz. What is the main advantage of the 4-core CPU?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'Both have the same clock speed (2GHz), so neither executes individual instructions faster.')"><span class="opt-k">A</span>It executes individual instructions twice as fast</button>
+            <button class="opt" onclick="pick(this,true,'Correct! More cores means more tasks can be processed simultaneously. The 4-core CPU handles 4 threads at once, greatly improving multitasking performance.')"><span class="opt-k">B</span>It can process more tasks simultaneously, improving multitasking</button>
+            <button class="opt" onclick="pick(this,false,'More cores don\'t directly reduce storage — those are separate components.')"><span class="opt-k">C</span>It uses less storage space</button>
+            <button class="opt" onclick="pick(this,false,'More cores actually use slightly more power, not less.')"><span class="opt-k">D</span>It consumes less electricity</button>
+          </div>
+          <div class="q-fb" id="f5"></div>
+        </div>
+
+        <div class="qb" data-i="6">
+          <p class="q-src">2024 Final · Q5b</p>
+          <p class="q-txt">A shop prints receipts automatically at the till. Which type of printer is most likely being used?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'Inkjet printers spray ink — used for home/office printing, not receipt systems.')"><span class="opt-k">A</span>Inkjet printer</button>
+            <button class="opt" onclick="pick(this,false,'Laser printers are fast and high-quality but too large and expensive for receipt printing.')"><span class="opt-k">B</span>Laser printer</button>
+            <button class="opt" onclick="pick(this,true,'Correct! Thermal printers use heat-sensitive paper and are ideal for receipts, ATM slips, and labels. They\'re fast, quiet, and cheap to run.')"><span class="opt-k">C</span>Thermal printer</button>
+            <button class="opt" onclick="pick(this,false,'3D printers create 3D objects — not used for receipts.')"><span class="opt-k">D</span>3D printer</button>
+          </div>
+          <div class="q-fb" id="f6"></div>
+        </div>
+
+        <div class="qb" data-i="7">
+          <p class="q-src">2025 Final · Q2b</p>
+          <p class="q-txt">Which of the following describes HDD storage technology?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'Flash memory is used in SSDs, not HDDs.')"><span class="opt-k">A</span>Uses flash memory chips with no moving parts</button>
+            <button class="opt" onclick="pick(this,true,'Correct! HDDs use magnetic spinning platters with a read/write head that physically moves to access data. This is why they\'re slower and more fragile than SSDs.')"><span class="opt-k">B</span>Uses magnetic spinning platters with a read/write head</button>
+            <button class="opt" onclick="pick(this,false,'Laser technology is used in optical storage (CD/DVD), not HDDs.')"><span class="opt-k">C</span>Uses laser technology to read and write data</button>
+            <button class="opt" onclick="pick(this,false,'Heat-sensitive paper is for thermal printers, not storage drives.')"><span class="opt-k">D</span>Uses heat-sensitive technology to record data</button>
+          </div>
+          <div class="q-fb" id="f7"></div>
+        </div>
+
+        <div class="qb" data-i="8">
+          <p class="q-src">CIT3100 2019 · Q1a</p>
+          <p class="q-txt">What is the function of the motherboard?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'Processing instructions is done by the CPU, not the motherboard.')"><span class="opt-k">A</span>To process and execute all instructions</button>
+            <button class="opt" onclick="pick(this,false,'Storing data long-term is done by HDD/SSD, not the motherboard.')"><span class="opt-k">B</span>To store data permanently</button>
+            <button class="opt" onclick="pick(this,true,'Correct! The motherboard is the backbone — a PCB that contains buses connecting all components: CPU, RAM, storage, and I/O devices. Everything connects through it.')"><span class="opt-k">C</span>To connect all computer components via buses and slots</button>
+            <button class="opt" onclick="pick(this,false,'Converting power is the function of the power supply unit (PSU), not the motherboard.')"><span class="opt-k">D</span>To convert AC power into DC power for components</button>
+          </div>
+          <div class="q-fb" id="f8"></div>
+        </div>
+
+        <div class="qb" data-i="9">
+          <p class="q-src">2025 Final · Q2</p>
+          <p class="q-txt">Which port would you use to connect a computer to a large screen for a presentation in a modern lecture hall?</p>
+          <div class="opts">
+            <button class="opt" onclick="pick(this,false,'USB is for devices and file transfer — not typically used for display output to projectors.')"><span class="opt-k">A</span>USB</button>
+            <button class="opt" onclick="pick(this,false,'PS/2 is only for keyboards and mice — has no display capability.')"><span class="opt-k">B</span>PS/2</button>
+            <button class="opt" onclick="pick(this,false,'SATA is an internal port for connecting storage drives inside the computer case.')"><span class="opt-k">C</span>SATA</button>
+            <button class="opt" onclick="pick(this,true,'Correct! HDMI transmits both high-definition audio and video digitally. It\'s the standard for connecting computers to monitors, projectors, and display screens.')"><span class="opt-k">D</span>HDMI</button>
+          </div>
+          <div class="q-fb" id="f9"></div>
+        </div>
+
+        <!-- Score -->
+        <div class="score-scr" id="scr">
+          <div class="score-box">
+            <div class="score-big" id="sc-n">0</div>
+            <div class="score-den">/ 10</div>
+          </div>
+          <p class="score-v" id="sc-v"></p>
+          <p class="score-a" id="sc-a"></p>
+          <button class="qbtn qbtn-p" onclick="resetQ()">RETRY</button>
+        </div>
+
+        <div class="quiz-foot" id="qfoot">
+          <button class="qbtn qbtn-g" id="qprev" onclick="prevQ()" disabled>← PREV</button>
+          <button class="qbtn qbtn-p" id="qnext" onclick="nextQ()" disabled>NEXT →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <span>CSC 2101 // TOPIC-02 // COMPUTER HARDWARE</span>
+  <a href="CSC2101_index.html">← BACK TO HOME</a>
+</footer>
+
+<script>
+// SCROLL REVEAL
+const obs = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:0.08});
+document.querySelectorAll('.sec').forEach(s=>obs.observe(s));
+
+// PAST PAPERS
+function togglePP(btn){
+  const body=btn.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+// QUIZ
+let cur=0,score=0,answered=Array(10).fill(false);
+
+function pick(btn,correct,msg){
+  if(answered[cur])return;
+  answered[cur]=true;
+  btn.closest('.opts').querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  const fb=document.getElementById('f'+cur);
+  fb.classList.add('show');
+  if(correct){
+    btn.classList.add('correct');score++;
+    fb.className='q-fb show good';
+    fb.innerHTML='<strong>✓ Correct</strong>'+msg;
+  } else {
+    btn.classList.add('wrong');
+    fb.className='q-fb show bad';
+    fb.innerHTML='<strong>✗ Wrong</strong>'+msg;
+    btn.closest('.opts').querySelectorAll('.opt').forEach(b=>{if(b.onclick.toString().includes(',true,'))b.classList.add('correct');});
+  }
+  document.getElementById('qnext').disabled=false;
+  updateQ();
+}
+
+function updateQ(){
+  document.getElementById('qn').textContent=cur+1;
+  const pct=answered.filter(Boolean).length/10*100;
+  document.getElementById('qf').style.width=pct+'%';
+  document.getElementById('qnext').textContent=(cur===9&&answered[cur])?'RESULTS →':'NEXT →';
+}
+
+function nextQ(){
+  if(cur<9){
+    document.querySelectorAll('.qb')[cur].classList.remove('active');
+    cur++;
+    document.querySelectorAll('.qb')[cur].classList.add('active');
+    document.getElementById('qprev').disabled=false;
+    document.getElementById('qnext').disabled=!answered[cur];
+    updateQ();
+  } else { showScore(); }
+}
+
+function prevQ(){
+  if(cur>0){
+    document.querySelectorAll('.qb')[cur].classList.remove('active');
+    cur--;
+    document.querySelectorAll('.qb')[cur].classList.add('active');
+    document.getElementById('qprev').disabled=cur===0;
+    document.getElementById('qnext').disabled=!answered[cur];
+    updateQ();
+  }
+}
+
+function showScore(){
+  document.querySelectorAll('.qb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('qfoot').style.display='none';
+  const s=document.getElementById('scr');s.classList.add('show');
+  document.getElementById('sc-n').textContent=score;
+  const p=score/10*100;
+  document.getElementById('sc-v').textContent=p>=80?'HARDWARE MASTER. SOLID.':p>=60?'DECENT. GAPS EXIST.':'BACK TO THE NOTES.';
+  document.getElementById('sc-a').textContent=p>=80?'Move to the next topic.':p>=60?'Review the sections you missed.':'Re-read §01–§05 carefully.';
+  document.getElementById('qf').style.width='100%';
+}
+
+function resetQ(){
+  cur=0;score=0;answered=Array(10).fill(false);
+  document.querySelectorAll('.qb').forEach((b,i)=>{
+    b.classList.toggle('active',i===0);
+    b.querySelectorAll('.opt').forEach(o=>{o.disabled=false;o.classList.remove('correct','wrong');});
+    const f=document.getElementById('f'+i);
+    if(f){f.className='q-fb';f.innerHTML='';}
+  });
+  document.getElementById('scr').classList.remove('show');
+  document.getElementById('qfoot').style.display='flex';
+  document.getElementById('qprev').disabled=true;
+  document.getElementById('qnext').disabled=true;
+  document.getElementById('qnext').textContent='NEXT →';
+  document.getElementById('qf').style.width='0%';
+  document.getElementById('qn').textContent='1';
+}
+</script>
+</body>
+</html>
